@@ -47,7 +47,6 @@ var photosMock = new Array(COUNT_PHOTO)
   .fill('')
   .map(getPhotoMock);
 
-console.log(photosMock)
 var photoTemplate = document.querySelector('#picture').content.querySelector('.picture');
 var picturesContainer = document.querySelector('.pictures');
 
@@ -57,7 +56,12 @@ var renderPhoto = function (photo) {
   photoElement.querySelector('.picture__info').inerHTML = photo.description;
   photoElement.querySelector('.picture__likes').inerHTML = photo.likes;
 
+  photoElement.addEventListener('click', function () {
+    renderPictureDetail(photo);
+  });
+
   return photoElement;
+
 };
 
 photosMock.forEach(function (photo) {
@@ -68,15 +72,17 @@ photosMock.forEach(function (photo) {
 // ----
 var templateComment = document.querySelector('.social__comment');
 
-var toAddModalBody = function () {
-  document.body.classList.add('modal-open');
-};
+// var toAddModalBody = function () {
+//   document.body.classList.add('modal-open');
+// };
 
-var toRemoveModalBody = function () {
-  document.body.classList.remove('modal-open');
-};
+// var toRemoveModalBody = function () {
+//   document.body.classList.remove('modal-open');
+// };
 
-var renderComments = function (template, commentData) {
+var pictureDetail = document.querySelector('.big-picture');
+
+var renderComment = function (template, commentData) {
   var comment = template.cloneNode(true);
   var img = comment.querySelector('.social__picture');
   img.setAttribute('src', commentData.avatar);
@@ -87,36 +93,70 @@ var renderComments = function (template, commentData) {
   return comment;
 };
 
-var renderBigPicture = function (bigPicture, photoMock) {
-  bigPicture.querySelector('.big-picture__img > img').setAttribute('src', photoMock.url);
-  bigPicture.querySelector('.likes-count').innerHTML = photoMock.likes;
-  bigPicture.querySelector('.social__caption').innerHTML = photoMock.description;
-  bigPicture.querySelector('.comments-count').innerHTML = photoMock.comment.length;
-  var commentsContainer = bigPicture.querySelector('.social__comments');
-  commentsContainer.innerHTML = '';
-
-  photoMock.comment.forEach(function (comment) {
-    commentsContainer.append(renderComments(templateComment, comment));
+var renderComments = function (render, comments, container) {
+  comments.forEach(function (comment) {
+    container.append(render(templateComment, comment));
   });
-  toAddModalBody();
 };
 
+// закрывает попап при нажатии на close
+var closeModalOnClick = function (modal) {
+  var closeBtn = modal.querySelector('.cancel');
+  closeBtn.addEventListener('click', function () {
+    onClosePopup(modal);
+  });
+};
+
+// отрисовывает детальную картинку
+var renderPictureDetail = function (photoMock) {
+  pictureDetail.querySelector('.big-picture__img > img').setAttribute('src', photoMock.url);
+  pictureDetail.querySelector('.likes-count').innerHTML = photoMock.likes;
+  pictureDetail.querySelector('.social__caption').innerHTML = photoMock.description;
+  pictureDetail.querySelector('.comments-count').innerHTML = photoMock.comment.length;
+
+  var commentsContainer = pictureDetail.querySelector('.social__comments');
+  commentsContainer.innerHTML = '';
+
+  renderComments(renderComment, photoMock.comment, commentsContainer);
+
+  onOpenPopup(pictureDetail);
+};
+
+// Открывает попап
+var onOpenPopup = function (element) {
+  element.classList.remove('hidden');
+  document.body.classList.add('modal-open');
+  closeModalOnClick(element);
+};
+
+// Закрывает попап
+var onClosePopup = function (element) {
+  element.classList.add('hidden');
+  document.body.classList.remove('modal-open');
+};
+
+// добавляет класс hidden
 var hiddenElement = function (element) {
   element.classList.add('hidden');
 };
 
-var visibleElement = function (element) {
-  element.classList.remove('hidden');
-};
 
-var bigPicture = document.querySelector('.big-picture');
-var bigPictureCommentsCount = bigPicture.querySelector('.social__comment-count');
-var bigPictureCommentsLoader = bigPicture.querySelector('.comments-loader');
-
-
-visibleElement(bigPicture);
+var bigPictureCommentsCount = pictureDetail.querySelector('.social__comment-count');
+var bigPictureCommentsLoader = pictureDetail.querySelector('.comments-loader');
 
 hiddenElement(bigPictureCommentsCount);
 hiddenElement(bigPictureCommentsLoader);
 
-renderBigPicture(bigPicture, photosMock[0]);
+// -------
+
+var uploadFile = document.querySelector('.img-upload__input');
+var uploaImgBlock = document.querySelector('.img-upload__overlay');
+
+uploadFile.addEventListener('change', function () {
+  imgUploadBlock();
+});
+
+var imgUploadBlock = function () {
+  console.log('sdfas')
+  onOpenPopup(uploaImgBlock);
+};
