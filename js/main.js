@@ -5,6 +5,7 @@ var MAX_COUNT_LIKES = 200;
 var MIN_COUNT_LIKES = 15;
 var MAX_COUNT_AVATAR = 6;
 
+
 var messages = [
   'Всё отлично!',
   'В целом всё неплохо. Но не всё.',
@@ -157,6 +158,158 @@ uploadFile.addEventListener('change', function () {
 });
 
 var imgUploadBlock = function () {
-  console.log('sdfas')
   onOpenPopup(uploaImgBlock);
 };
+onOpenPopup(uploaImgBlock);
+// слайдер
+
+// 2.2. Наложение эффекта на изображение
+
+var pictureEffects = {
+  pin: document.querySelector('.effect-level__pin'),
+  pinValue: document.querySelector('.effect-level__value'),
+  sliderContainer: document.querySelector('.effect-level'),
+  depth: document.querySelector('.effect-level__depth'),
+  pinContainer: document.querySelector('.effect-level__line'),
+  image: document.querySelector('.img-upload__preview > img'),
+  pinContainerWidth: document.querySelector('.effect-level__line').getBoundingClientRect().width,
+  value: 1,
+  activeEffect: 'none',
+  effects: {
+    none: 'none',
+    chrome: 'grayscale',
+    sepia: 'sepia',
+    marvin: 'invert',
+    phobos: 'blur',
+    heat: 'brightness'
+  }
+}
+
+pictureEffects.mousedown = function (evt) {
+   
+  evt.preventDefault();
+  var pinCoordX = this.pin.getBoundingClientRect().left;
+
+  var pinContainerLeft = this.pinContainer.getBoundingClientRect().left;
+  let shiftX = event.clientX - pinCoordX;
+
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
+
+  function onMouseMove(evt) {
+    var newLeft = event.clientX - shiftX - pinContainerLeft;
+    if (newLeft < 0) {
+      newLeft = 0;
+    }
+
+    var maxValue = pictureEffects.pinContainerWidth;
+    if (newLeft > maxValue) {
+      newLeft = maxValue;
+    }
+
+    pictureEffects.setSliderValue(newLeft);
+  }
+
+  function onMouseUp() {
+    document.removeEventListener('mouseup', onMouseUp);
+    document.removeEventListener('mousemove', onMouseMove);
+  }
+}
+
+  pictureEffects.setSliderValue = function (value) {
+    pictureEffects.pin.style.left = value + 'px';
+    pictureEffects.value = Math.floor(value / pictureEffects.pinContainerWidth * 100);
+    pictureEffects.setValue(pictureEffects.value);
+    pictureEffects.depth.style.width = pictureEffects.value   + '%';
+    pictureEffects.pinValue.setAttribute('value', pictureEffects.value);
+}
+
+pictureEffects.toAddClass = function () {
+  document.addEventListener('click', function (evt) {
+    if(evt.target.matches('input[type="radio"]')) {
+      var value = evt.target.getAttribute('value');
+      pictureEffects.activeEffect = value;
+      var classAdd = (value !== pictureEffects.effects.none) ? 'effects__preview--' + value : '';
+      pictureEffects.image.className = classAdd;
+      pictureEffects.setValue(100)
+      pictureEffects.setSliderValue(pictureEffects.pinContainerWidth);
+    };
+  });
+}
+
+pictureEffects.hiddenSlider = function () {
+  pictureEffects.sliderContainer.classList.add('visually-hidden');
+}
+
+pictureEffects.visibleSlider = function () {
+  pictureEffects.sliderContainer.classList.remove('visually-hidden');
+}
+
+pictureEffects.setValue = function (value) {
+  var styleName = pictureEffects.activeEffect;
+  var set = {
+    none: 'none',
+    chrome: value / 100,
+    sepia: value / 100,
+    marvin: value + '%',
+    phobos: value / 100 * 3 + 'px',
+    heat: 1 + 2 * value / 100
+  }
+  if(styleName == 'none') {
+    pictureEffects.image.style.filter = null;
+    pictureEffects.hiddenSlider();
+  }
+  else {
+    pictureEffects.image.style.filter = pictureEffects.effects[styleName] + '(' + set[styleName] + ')';
+    pictureEffects.visibleSlider();
+   }
+}
+
+
+pictureEffects.init = function () {
+  pictureEffects.hiddenSlider();
+  this.toAddClass();
+  document.addEventListener('mousedown', function(evt) {
+    pictureEffects.mousedown(evt);
+  });
+}
+
+pictureEffects.init();
+
+// 2.1.уменьшение и увеличение размера изображения
+
+var getChangePictureSize = {
+  scaleСontrolValue: document.querySelector('.scale__control--value'),
+  btnSmaller: document.querySelector('.scale__control--smaller'),
+  btnBigger: document.querySelector('.scale__control--bigger'),
+  image: document.querySelector('.img-upload__preview > img'),
+  STEP_CHANGE: 25,
+  MAX_STEP: 100,
+  MIN_STEP: 25,
+  initialValue: 100,
+  STATES: {
+    smaller: 'smaller',
+    bigger: 'bigger'
+  }
+};
+
+getChangePictureSize.onClick = function (btn, state) {
+  btn.addEventListener('click', function() {
+    getChangePictureSize.changeSizeImg(state);
+  });
+};
+
+getChangePictureSize.changeSizeImg = function (state) {
+  this.initialValue = (state == this.STATES.smaller) ? this.initialValue - this.STEP_CHANGE : this.initialValue + this.STEP_CHANGE;
+  this.initialValue = (this.initialValue > this.MAX_STEP)?  this.MAX_STEP : (this.initialValue < this.MIN_STEP) ? this.MIN_STEP : this.initialValue;
+  this.scaleСontrolValue.value = this.initialValue + '%';
+  this.image.style.transform = 'scale(' + this.initialValue / 100 + ')';
+};
+
+getChangePictureSize.init = function () {
+  this.scaleСontrolValue.value = this.initialValue + '%';
+  this.onClick(this.btnSmaller, this.STATES.smaller);
+  this.onClick(this.btnBigger, this.STATES.bigger);
+};
+
+getChangePictureSize.init();
