@@ -48,7 +48,6 @@ var getPhotoMock = function () {
   };
 };
 
-
 var photosMock = new Array(COUNT_PHOTO)
   .fill('')
   .map(getPhotoMock);
