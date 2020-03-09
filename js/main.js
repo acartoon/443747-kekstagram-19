@@ -184,10 +184,10 @@ var pictureEffects = {
     phobos: 'blur',
     heat: 'brightness'
   }
-}
+};
 
 pictureEffects.mousedown = function (evt) {
-   
+
   evt.preventDefault();
   var pinCoordX = this.pin.getBoundingClientRect().left;
 
@@ -197,7 +197,7 @@ pictureEffects.mousedown = function (evt) {
   document.addEventListener('mousemove', onMouseMove);
   document.addEventListener('mouseup', onMouseUp);
 
-  function onMouseMove(evt) {
+  function onMouseMove() {
     var newLeft = event.clientX - shiftX - pinContainerLeft;
     if (newLeft < 0) {
       newLeft = 0;
@@ -215,36 +215,36 @@ pictureEffects.mousedown = function (evt) {
     document.removeEventListener('mouseup', onMouseUp);
     document.removeEventListener('mousemove', onMouseMove);
   }
-}
+};
 
-  pictureEffects.setSliderValue = function (value) {
-    pictureEffects.pin.style.left = value + 'px';
-    pictureEffects.value = Math.floor(value / pictureEffects.pinContainerWidth * 100);
-    pictureEffects.setValue(pictureEffects.value);
-    pictureEffects.depth.style.width = pictureEffects.value   + '%';
-    pictureEffects.pinValue.setAttribute('value', pictureEffects.value);
-}
+pictureEffects.setSliderValue = function (value) {
+  pictureEffects.pin.style.left = value + 'px';
+  pictureEffects.value = Math.floor(value / pictureEffects.pinContainerWidth * 100);
+  pictureEffects.setValue(pictureEffects.value);
+  pictureEffects.depth.style.width = pictureEffects.value + '%';
+  pictureEffects.pinValue.setAttribute('value', pictureEffects.value);
+};
 
 pictureEffects.toAddClass = function () {
   document.addEventListener('click', function (evt) {
-    if(evt.target.matches('input[type="radio"]')) {
+    if (evt.target.matches('input[type="radio"]')) {
       var value = evt.target.getAttribute('value');
       pictureEffects.activeEffect = value;
       var classAdd = (value !== pictureEffects.effects.none) ? 'effects__preview--' + value : '';
       pictureEffects.image.className = classAdd;
-      pictureEffects.setValue(100)
+      pictureEffects.setValue(100);
       pictureEffects.setSliderValue(pictureEffects.pinContainerWidth);
-    };
+    }
   });
-}
+};
 
 pictureEffects.hiddenSlider = function () {
   pictureEffects.sliderContainer.classList.add('visually-hidden');
-}
+};
 
 pictureEffects.visibleSlider = function () {
   pictureEffects.sliderContainer.classList.remove('visually-hidden');
-}
+};
 
 pictureEffects.setValue = function (value) {
   var styleName = pictureEffects.activeEffect;
@@ -255,25 +255,25 @@ pictureEffects.setValue = function (value) {
     marvin: value + '%',
     phobos: value / 100 * 3 + 'px',
     heat: 1 + 2 * value / 100
-  }
-  if(styleName == 'none') {
+  };
+
+  if (styleName === 'none') {
     pictureEffects.image.style.filter = null;
     pictureEffects.hiddenSlider();
-  }
-  else {
+  } else {
     pictureEffects.image.style.filter = pictureEffects.effects[styleName] + '(' + set[styleName] + ')';
     pictureEffects.visibleSlider();
-   }
-}
+  }
+};
 
 
 pictureEffects.init = function () {
   pictureEffects.hiddenSlider();
   this.toAddClass();
-  pictureEffects.pin.addEventListener('mousedown', function(evt) {
+  pictureEffects.pin.addEventListener('mousedown', function (evt) {
     pictureEffects.mousedown(evt);
   });
-}
+};
 
 pictureEffects.init();
 
@@ -295,15 +295,21 @@ var getChangePictureSize = {
 };
 
 getChangePictureSize.onClick = function (btn, state) {
-  btn.addEventListener('click', function() {
+  btn.addEventListener('click', function () {
     getChangePictureSize.changeSizeImg(state);
   });
 };
 
-// 
 getChangePictureSize.changeSizeImg = function (state) {
-  this.initialValue = (state == this.STATES.smaller) ? this.initialValue - this.STEP_CHANGE : this.initialValue + this.STEP_CHANGE;
-  this.initialValue = (this.initialValue > this.MAX_STEP)?  this.MAX_STEP : (this.initialValue < this.MIN_STEP) ? this.MIN_STEP : this.initialValue;
+  this.initialValue = (state === this.STATES.smaller) ? this.initialValue - this.STEP_CHANGE : this.initialValue + this.STEP_CHANGE;
+  if (this.initialValue > this.MAX_STEP) {
+    this.initialValue = this.MAX_STEP;
+  }
+
+  if (this.initialValue < this.MIN_STEP) {
+    this.initialValue = this.MIN_STEP;
+  }
+
   this.scaleСontrolValue.value = this.initialValue + '%';
   this.image.style.transform = 'scale(' + this.initialValue / 100 + ')';
 };
