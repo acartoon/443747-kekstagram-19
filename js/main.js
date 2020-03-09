@@ -8,7 +8,7 @@ var MAX_COUNT_AVATAR = 6;
 var keys = {
   ESCAPE: 'Escape',
   ESC: 'Esc'
-}
+};
 
 
 var messages = [
@@ -137,19 +137,18 @@ var onOpenPopup = function (element) {
 };
 
 var onEscKeyDown = function (evt, element) {
-  console.log(element)
   if (evt.key === keys.ESCAPE || evt.key === keys.ESC) {
     onClosePopup(element);
     // document.removeEventListener('keydown', f)
   }
-}
+};
 
 
 var closeModalOnKeydown = function (element) {
   document.addEventListener('keydown', function (evt) {
     onEscKeyDown(evt, element);
   }, true);
-}
+};
 
 // Закрывает попап
 var onClosePopup = function (element) {
