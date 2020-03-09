@@ -5,6 +5,11 @@ var MAX_COUNT_LIKES = 200;
 var MIN_COUNT_LIKES = 15;
 var MAX_COUNT_AVATAR = 6;
 
+var keys = {
+  ESCAPE: 'Escape',
+  ESC: 'Esc'
+}
+
 
 var messages = [
   'Всё отлично!',
@@ -62,7 +67,6 @@ var renderPhoto = function (photo) {
   });
 
   return photoElement;
-
 };
 
 photosMock.forEach(function (photo) {
@@ -123,12 +127,29 @@ var renderPictureDetail = function (photoMock) {
   onOpenPopup(pictureDetail);
 };
 
+
 // Открывает попап
 var onOpenPopup = function (element) {
   element.classList.remove('hidden');
   document.body.classList.add('modal-open');
+  closeModalOnKeydown(element);
   closeModalOnClick(element);
 };
+
+var onEscKeyDown = function (evt, element) {
+  console.log(element)
+  if (evt.key === keys.ESCAPE || evt.key === keys.ESC) {
+    onClosePopup(element);
+    // document.removeEventListener('keydown', f)
+  }
+}
+
+
+var closeModalOnKeydown = function (element) {
+  document.addEventListener('keydown', function (evt) {
+    onEscKeyDown(evt, element);
+  }, true);
+}
 
 // Закрывает попап
 var onClosePopup = function (element) {
@@ -319,5 +340,5 @@ getChangePictureSize.init = function () {
   this.onClick(this.btnSmaller, this.STATES.smaller);
   this.onClick(this.btnBigger, this.STATES.bigger);
 };
-// xnj-nj
+
 getChangePictureSize.init();
