@@ -300,6 +300,7 @@ getChangePictureSize.onClick = function (btn, state) {
   });
 };
 
+// 
 getChangePictureSize.changeSizeImg = function (state) {
   this.initialValue = (state == this.STATES.smaller) ? this.initialValue - this.STEP_CHANGE : this.initialValue + this.STEP_CHANGE;
   this.initialValue = (this.initialValue > this.MAX_STEP)?  this.MAX_STEP : (this.initialValue < this.MIN_STEP) ? this.MIN_STEP : this.initialValue;
