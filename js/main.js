@@ -192,7 +192,7 @@ pictureEffects.mousedown = function (evt) {
   var pinCoordX = this.pin.getBoundingClientRect().left;
 
   var pinContainerLeft = this.pinContainer.getBoundingClientRect().left;
-  let shiftX = event.clientX - pinCoordX;
+  var shiftX = event.clientX - pinCoordX;
 
   document.addEventListener('mousemove', onMouseMove);
   document.addEventListener('mouseup', onMouseUp);
