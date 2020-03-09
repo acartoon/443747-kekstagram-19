@@ -160,7 +160,8 @@ uploadFile.addEventListener('change', function () {
 var imgUploadBlock = function () {
   onOpenPopup(uploaImgBlock);
 };
-onOpenPopup(uploaImgBlock);
+
+// onOpenPopup(uploaImgBlock);
 // слайдер
 
 // 2.2. Наложение эффекта на изображение
@@ -269,7 +270,7 @@ pictureEffects.setValue = function (value) {
 pictureEffects.init = function () {
   pictureEffects.hiddenSlider();
   this.toAddClass();
-  document.addEventListener('mousedown', function(evt) {
+  pictureEffects.pin.addEventListener('mousedown', function(evt) {
     pictureEffects.mousedown(evt);
   });
 }
@@ -313,3 +314,5 @@ getChangePictureSize.init = function () {
 };
 
 getChangePictureSize.init();
+
+
