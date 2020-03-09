@@ -313,5 +313,5 @@ getChangePictureSize.init = function () {
   this.onClick(this.btnSmaller, this.STATES.smaller);
   this.onClick(this.btnBigger, this.STATES.bigger);
 };
-
+// xnj-nj
 getChangePictureSize.init();
