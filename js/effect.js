@@ -19,7 +19,7 @@
       heat: 'brightness'
     }
   };
-
+  // console.log('sdfasdf')
   pictureEffects.mousedown = function (evt) {
 
     evt.preventDefault();
