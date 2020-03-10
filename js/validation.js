@@ -20,55 +20,55 @@
     },
     errors: []
   };
-  
+
   validation.splitTags = function (string) {
     validation.tagsArray = string.toLowerCase().split(' ');
   };
-  
+
   // теги начинаются с решетки
   validation.checkFirstСharacter = function (item) {
     return item[0] === validation.hash ? true : false;
   };
-  
+
   // решетка только в начале тега
   validation.checkHashNumber = function (item) {
     return item.indexOf(validation.hash, 1) === -1;
   };
-  
+
   // длина одного тега не больше 20 знаков
   validation.checkMaxLengtTags = function (item) {
     return item.length < validation.MAX_LENGTH ? true : false;
   };
-  
+
   // длина одного тега не меньше 1 знака
   validation.checkMinLengtTags = function (item) {
     return item.length >= validation.MIN_LENGTH ? true : false;
   };
-  
+
   // тег содержит только буквы и цифры
   validation.checkTagsContent = function (item) {
     return validation.HASHTAG_PATTERN.test(item);
   };
-  
+
   // максимальное количество тегов
   validation.checkCountTags = function (array) {
     return array.length <= validation.MAX_COUNT ? true : false;
   };
-  
+
   // повторы одинаковых тегов
   validation.checkDoubleTags = function (array) {
     return array.every(function (item, ind) {
       return array.indexOf(item) === ind;
     });
   };
-  
+
   // добавление ошибок в массив ошибок
   validation.pushErrorMessage = function (errorMessages) {
     if (validation.errors.indexOf(errorMessages) === -1) {
       validation.errors.push(errorMessages);
     }
   };
-  
+
   validation.chackAll = function (array) {
     if (!validation.checkCountTags(array)) {
       validation.pushErrorMessage(validation.mistakes.maxCountTag);
@@ -97,13 +97,13 @@
       }
     }
   };
-  
+
   validation.getValue = function () {
     var inputValue = validation.input.value;
     validation.splitTags(inputValue);
     validation.chackAll(validation.tagsArray);
   };
-  
+
   validation.init = function () {
     validation.input.addEventListener('keyup', function () {
       validation.errors = [];
@@ -115,6 +115,7 @@
       }
     });
   };
-  
+
   validation.init();
-})()
+})();
+

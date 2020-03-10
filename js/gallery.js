@@ -7,4 +7,4 @@
     var photoBlock = window.picture.renderPhoto(photo);
     picturesContainer.append(photoBlock);
   });
-})()
+})();

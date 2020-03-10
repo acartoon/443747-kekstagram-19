@@ -19,39 +19,38 @@
       heat: 'brightness'
     }
   };
-  
+
   pictureEffects.mousedown = function (evt) {
-    console.log('click')
-  
+
     evt.preventDefault();
     var pinCoordX = this.pin.getBoundingClientRect().left;
-  
+
     var pinContainerLeft = this.pinContainer.getBoundingClientRect().left;
     var shiftX = event.clientX - pinCoordX;
-  
+
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
-  
+
     function onMouseMove() {
       var newLeft = event.clientX - shiftX - pinContainerLeft;
       if (newLeft < 0) {
         newLeft = 0;
       }
-  
+
       var maxValue = pictureEffects.pinContainer.getBoundingClientRect().width;
       if (newLeft > maxValue) {
         newLeft = maxValue;
       }
-  
+
       pictureEffects.setSliderValue(newLeft);
     }
-  
+
     function onMouseUp() {
       document.removeEventListener('mouseup', onMouseUp);
       document.removeEventListener('mousemove', onMouseMove);
     }
   };
-  
+
   pictureEffects.setSliderValue = function (value) {
     pictureEffects.pin.style.left = value + 'px';
     pictureEffects.value = Math.floor(value / pictureEffects.pinContainer.getBoundingClientRect().width * 100);
@@ -59,7 +58,7 @@
     pictureEffects.depth.style.width = pictureEffects.value + '%';
     pictureEffects.pinValue.setAttribute('value', pictureEffects.value);
   };
-  
+
   pictureEffects.toAddClass = function () {
     document.addEventListener('click', function (evt) {
       if (evt.target.matches('input[type="radio"]')) {
@@ -72,15 +71,15 @@
       }
     });
   };
-  
+
   pictureEffects.hiddenSlider = function () {
     pictureEffects.sliderContainer.classList.add('visually-hidden');
   };
-  
+
   pictureEffects.visibleSlider = function () {
     pictureEffects.sliderContainer.classList.remove('visually-hidden');
   };
-  
+
   pictureEffects.setValue = function (value) {
     var styleName = pictureEffects.activeEffect;
     var set = {
@@ -100,7 +99,7 @@
       pictureEffects.visibleSlider();
     }
   };
-  
+
   pictureEffects.init = function () {
     pictureEffects.hiddenSlider();
     this.toAddClass();
@@ -108,6 +107,6 @@
       pictureEffects.mousedown(evt);
     });
   };
-  
+
   pictureEffects.init();
 })();

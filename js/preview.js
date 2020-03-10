@@ -45,5 +45,5 @@
 
   window.preview = {
     renderPictureDetail: renderPictureDetail
-  }
-})()
+  };
+})();

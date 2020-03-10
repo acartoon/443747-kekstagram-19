@@ -23,33 +23,33 @@
       bigger: 'bigger'
     }
   };
-  
+
   getChangePictureSize.onClick = function (btn, state) {
     btn.addEventListener('click', function () {
       getChangePictureSize.changeSizeImg(state);
     });
   };
-  
+
   getChangePictureSize.changeSizeImg = function (state) {
     this.initialValue = (state === this.STATES.smaller) ? this.initialValue - this.STEP_CHANGE : this.initialValue + this.STEP_CHANGE;
     if (this.initialValue > this.MAX_STEP) {
       this.initialValue = this.MAX_STEP;
     }
-  
+
     if (this.initialValue < this.MIN_STEP) {
       this.initialValue = this.MIN_STEP;
     }
-  
+
     this.scaleСontrolValue.value = this.initialValue + '%';
     this.image.style.transform = 'scale(' + this.initialValue / 100 + ')';
   };
-  
+
   getChangePictureSize.init = function () {
     this.scaleСontrolValue.value = this.initialValue + '%';
     this.onClick(this.btnSmaller, this.STATES.smaller);
     this.onClick(this.btnBigger, this.STATES.bigger);
   };
-  
+
   getChangePictureSize.init();
 
 })();
