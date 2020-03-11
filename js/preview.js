@@ -27,7 +27,7 @@
     pictureDetail.querySelector('.big-picture__img > img').setAttribute('src', photoMock.url);
     pictureDetail.querySelector('.likes-count').innerHTML = photoMock.likes;
     pictureDetail.querySelector('.social__caption').innerHTML = photoMock.description;
-    pictureDetail.querySelector('.comments-count').innerHTML = photoMock.comment.length;
+    pictureDetail.querySelector('.comments-count').innerHTML = photoMock.comments.length;
 
     var commentsContainer = pictureDetail.querySelector('.social__comments');
     commentsContainer.innerHTML = '';

@@ -29,6 +29,7 @@
   var onEscKeyDown = function (evt, element) {
     if (evt.key === keys.ESCAPE || evt.key === keys.ESC) {
       onClosePopup(element);
+      console.log('sldkfjls');
       // document.removeEventListener('keydown', f)
     }
   };
@@ -44,7 +45,7 @@
   var closeModalOnKeydown = function (element) {
     document.addEventListener('keydown', function (evt) {
       onEscKeyDown(evt, element);
-    }, true);
+    }, false);
   };
 
   window.utils = {
