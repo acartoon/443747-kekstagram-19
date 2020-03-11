@@ -39,7 +39,7 @@
       url: 'photos/' + getRandomNumber(1, COUNT_PHOTO) + '.jpg',
       description: messages[getRandomNumber(0, messages.length - 1)],
       likes: getRandomNumber(MIN_COUNT_LIKES, MAX_COUNT_LIKES),
-      comment: comment
+      comments: comment
     };
   };
 
