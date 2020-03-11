@@ -34,13 +34,13 @@
   };
 
 
-  window.load(URL, onSuccess, onError);
+  window.load(URL, onSuccessf, onErrorf);
 
-  function onSuccess(data) {
+  function onSuccessf(data) {
     console.log(data);
   }
 
-  function onError(data) {
+  function onErrorf(data) {
     console.log(data);
   }
 

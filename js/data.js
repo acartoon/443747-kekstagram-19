@@ -47,8 +47,6 @@
     .fill('')
     .map(getPhotoMock);
 
-    console.log(photosMock)
-
   window.data = {
     photosMock: photosMock
   };
