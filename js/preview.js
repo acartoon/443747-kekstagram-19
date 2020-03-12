@@ -23,17 +23,19 @@
   };
 
   // отрисовывает детальную картинку
-  var renderPictureDetail = function (photoMock) {
-    pictureDetail.querySelector('.big-picture__img > img').setAttribute('src', photoMock.url);
-    pictureDetail.querySelector('.likes-count').innerHTML = photoMock.likes;
-    pictureDetail.querySelector('.social__caption').innerHTML = photoMock.description;
-    pictureDetail.querySelector('.comments-count').innerHTML = photoMock.comments.length;
+  var renderPictureDetail = function (photoData) {
+    pictureDetail.querySelector('.big-picture__img > img').setAttribute('src', photoData.url);
+    pictureDetail.querySelector('.likes-count').innerHTML = photoData.likes;
+    pictureDetail.querySelector('.social__caption').innerHTML = photoData.description;
+    pictureDetail.querySelector('.comments-count').innerHTML = photoData.comments.length;
 
     var commentsContainer = pictureDetail.querySelector('.social__comments');
     commentsContainer.innerHTML = '';
 
-    renderComments(renderComment, photoMock.comment, commentsContainer);
-    window.utils.onOpenPopup(pictureDetail);
+    renderComments(renderComment, photoData.comments, commentsContainer);
+    // window.utils.onOpenPopup(pictureDetail);
+    var modal = new window.Modal(pictureDetail);
+    modal.open();
   };
 
   var bigPictureCommentsCount = pictureDetail.querySelector('.social__comment-count');
