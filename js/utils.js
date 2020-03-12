@@ -2,23 +2,9 @@
 
 (function () {
 
-  var keys = {
+  var KEYS = {
     ESCAPE: 'Escape',
     ESC: 'Esc'
-  };
-
-  // Открывает попап
-  var onOpenPopup = function (element) {
-    element.classList.remove('hidden');
-    document.body.classList.add('modal-open');
-    closeModalOnKeydown(element);
-    closeModalOnClick(element);
-  };
-
-  // Закрывает попап
-  var onClosePopup = function (element) {
-    element.classList.add('hidden');
-    document.body.classList.remove('modal-open');
   };
 
   // добавляет класс hidden
@@ -26,35 +12,46 @@
     element.classList.add('hidden');
   };
 
-  var onEscKeyDown = function (evt, element) {
-    if (evt.key === keys.ESCAPE || evt.key === keys.ESC) {
-      onClosePopup(element);
-      console.log('sldkfjls');
-      // document.removeEventListener('keydown', f)
-    }
-  };
+  window.Modal = function (window, buttonClass) {
+    this._window = window;
+    this._buttonClass = buttonClass;
+    this.KEYS = KEYS;
 
-  // закрывает попап при нажатии на close
-  var closeModalOnClick = function (modal) {
-    var closeBtn = modal.querySelector('.cancel');
-    closeBtn.addEventListener('click', function () {
-      onClosePopup(modal);
-    });
-  };
+    this._closeModalOnKeydown = function () {
+      this._onKeydown = this._onKeydown.bind(this);
+      document.addEventListener('keydown', this._onKeydown);
+    };
 
-  var closeModalOnKeydown = function (element) {
-    document.addEventListener('keydown', function (evt) {
-      onEscKeyDown(evt, element);
-    }, false);
+    this.open = function () {
+      this._window.classList.remove('hidden');
+      document.body.classList.add('modal-open');
+      this._close = this._close.bind(this);
+      this._onClose();
+      this._closeModalOnKeydown();
+    };
+
+    this._onKeydown = function (evt) {
+      if (evt.key === this.KEYS.ESCAPE || evt.key === this.KEYS.ESC) {
+        this._close();
+        document.removeEventListener('keydown', this._onKeydown);
+      }
+    };
+
+    this._close = function () {
+      this._window.classList.add('hidden');
+      document.body.classList.remove('modal-open');
+      // console.log(this._window);
+    };
+
+    this._onClose = function () {
+      var closeBtn = this._window.querySelector('.cancel');
+      closeBtn.addEventListener('click', this._close);
+    };
   };
 
   window.utils = {
-    onEscKeyDown: onEscKeyDown,
-    hiddenElement: hiddenElement,
-    onClosePopup: onClosePopup,
-    onOpenPopup: onOpenPopup,
-    closeModalOnKeydown: closeModalOnKeydown,
+    KEYS: KEYS,
+    hiddenElement: hiddenElement
   };
 
 })();
-

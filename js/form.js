@@ -4,52 +4,77 @@
 
   var uploadFile = document.querySelector('.img-upload__input');
   var uploaImgBlock = document.querySelector('.img-upload__overlay');
+  var modal = new window.Modal(uploaImgBlock);
 
   uploadFile.addEventListener('change', function () {
-    window.utils.onOpenPopup(uploaImgBlock);
+    modal.open();
   });
 
-  var getChangePictureSize = {
-    scaleСontrolValue: document.querySelector('.scale__control--value'),
-    btnSmaller: document.querySelector('.scale__control--smaller'),
-    btnBigger: document.querySelector('.scale__control--bigger'),
-    image: document.querySelector('.img-upload__preview > img'),
-    STEP_CHANGE: 25,
-    MAX_STEP: 100,
-    MIN_STEP: 25,
-    initialValue: 100,
-    STATES: {
-      smaller: 'smaller',
-      bigger: 'bigger'
-    }
+  var imgUploadFormElement = document.querySelector('.img-upload__form');
+
+  var Form = function (template, func) {
+    this._template = template;
+    this._KEYS = window.utils.KEYS;
+    this._func = func;
+    this._message = template.cloneNode(true);
+    this._btn = this._message.querySelector('.success__button');
+
+    this.init = function () {
+      this._func();
+      document.body.append(this._message);
+      this._onClose();
+    };
+
+    this._onClose = function () {
+      this._onKeydown = this._onKeydown.bind(this);
+      this._onClose2 = this._onClose2.bind(this);
+      this._closeMessage = this._closeMessage.bind(this);
+      this._message.addEventListener('click', this._onClose2);
+      document.addEventListener('keydown', this._onKeydown);
+      this._btn.addEventListener('click', this._closeMessage);
+    };
+
+    this._resetForm = function () {
+      document.querySelector('.img-upload__form').reset();
+    };
+
+    this._closeMessage = function () {
+      this._message.remove();
+      this._btn.removeEventListener('click', this._closeMessage);
+      this._message.removeEventListener('click', this._onKeydown);
+      document.removeEventListener('keydown', this._onKeydown);
+    };
+
+    this._onClose2 = function (evt) {
+      if (evt.target.classList.contains('success')) {
+        this._closeMessage();
+      }
+    };
+
+    this._onKeydown = function (evt) {
+      if (evt.key === this._KEYS.ESCAPE || evt.key === this._KEYS.ESC) {
+        this._closeMessage();
+        document.removeEventListener('keydown', this._onKeydown);
+      }
+    };
   };
 
-  getChangePictureSize.onClick = function (btn, state) {
-    btn.addEventListener('click', function () {
-      getChangePictureSize.changeSizeImg(state);
-    });
-  };
+  function showSuccessMessage() {
+    var template = document.querySelector('#success').content.querySelector('.success');
+    var success = new Form(template, modal._close);
+    success.init();
+  }
 
-  getChangePictureSize.changeSizeImg = function (state) {
-    this.initialValue = (state === this.STATES.smaller) ? this.initialValue - this.STEP_CHANGE : this.initialValue + this.STEP_CHANGE;
-    if (this.initialValue > this.MAX_STEP) {
-      this.initialValue = this.MAX_STEP;
-    }
+  function showErrorMessage() {
+    var template = document.querySelector('#error').content.querySelector('.error');
+    var error = new Form(template, modal._close);
+    error.init();
+  }
 
-    if (this.initialValue < this.MIN_STEP) {
-      this.initialValue = this.MIN_STEP;
-    }
-
-    this.scaleСontrolValue.value = this.initialValue + '%';
-    this.image.style.transform = 'scale(' + this.initialValue / 100 + ')';
-  };
-
-  getChangePictureSize.init = function () {
-    this.scaleСontrolValue.value = this.initialValue + '%';
-    this.onClick(this.btnSmaller, this.STATES.smaller);
-    this.onClick(this.btnBigger, this.STATES.bigger);
-  };
-
-  getChangePictureSize.init();
+  imgUploadFormElement.addEventListener('submit', function (evt) {
+    evt.preventDefault();
+    window.backend.onSend(new FormData(imgUploadFormElement), showSuccessMessage, showErrorMessage);
+    window.effect.default();
+  });
 
 })();

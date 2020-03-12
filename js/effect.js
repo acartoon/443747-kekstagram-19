@@ -1,6 +1,39 @@
 'use strict';
 
 (function () {
+
+  var getFilterProperty = function (sliderValue) {
+    var heat = 1 + 2 * (sliderValue / 100);
+    var effects = {
+      none: {
+        name: '',
+        filterProperty: ''
+      },
+      chrome: {
+        filterProperty: 'grayscale(' + sliderValue / 100 + ')',
+        name: 'effects__preview--chrome'
+      },
+      sepia: {
+        filterProperty: 'sepia(' + sliderValue / 100 + ')',
+        name: 'effects__preview--sepia'
+      },
+      marvin: {
+        filterProperty: 'invert(' + sliderValue + '%)',
+        name: 'effects__preview--marvin'
+      },
+      phobos: {
+        filterProperty: 'blur(' + sliderValue / 100 * 3 + 'px)',
+        name: 'effects__preview--phobos'
+      },
+      heat: {
+        filterProperty: 'brightness(' + heat + ')',
+        name: 'effects__preview--heat'
+      }
+    };
+    return effects[pictureEffects.activeEffect];
+  };
+
+  // инициализация
   var pictureEffects = {
     pin: document.querySelector('.effect-level__pin'),
     pinValue: document.querySelector('.effect-level__value'),
@@ -9,17 +42,33 @@
     pinContainer: document.querySelector('.effect-level__line'),
     image: document.querySelector('.img-upload__preview > img'),
     value: 1,
+    defaultValue: 100,
     activeEffect: 'none',
-    effects: {
-      none: 'none',
-      chrome: 'grayscale',
-      sepia: 'sepia',
-      marvin: 'invert',
-      phobos: 'blur',
-      heat: 'brightness'
-    }
   };
-  // console.log('sdfasdf')
+
+  // применение значений по умолчанию значение 100% и без эффекта
+  pictureEffects.default = function () {
+    // скрывает слайдер
+    pictureEffects.hiddenSlider();
+
+    // отменяет выбранные значения
+    document.querySelectorAll('[name="effect"]').forEach(function (element) {
+      element.checked = false;
+    });
+
+    // устанавливает значение по умолчанию
+    var defaultElem = document.querySelector('#effect-none');
+    defaultElem.checked = true;
+
+    // устанавливает положение слайдера по умолчанию на 100%
+    pictureEffects.setSliderValue(pictureEffects.defaultValue);
+
+    // устанавливает параметр фильтра
+    pictureEffects.setValue(pictureEffects.defaultValue);
+
+  };
+
+  // передвижение ползунка и передача значения в фукнцию по применению эффектов
   pictureEffects.mousedown = function (evt) {
 
     evt.preventDefault();
@@ -42,7 +91,14 @@
         newLeft = maxValue;
       }
 
-      pictureEffects.setSliderValue(newLeft);
+      // значение в % положения слайдера и параметров фильтра
+      var value = Math.floor(newLeft / pictureEffects.pinContainer.getBoundingClientRect().width * 100);
+
+      // устанавливает положение слайдера
+      pictureEffects.setSliderValue(value);
+
+      // устанавливает значение активного фильтра
+      pictureEffects.setValue(value);
     }
 
     function onMouseUp() {
@@ -51,57 +107,62 @@
     }
   };
 
+  // устанавливает позицию слайдера исходя из получаемого значения в %
   pictureEffects.setSliderValue = function (value) {
-    pictureEffects.pin.style.left = value + 'px';
-    pictureEffects.value = Math.floor(value / pictureEffects.pinContainer.getBoundingClientRect().width * 100);
-    pictureEffects.setValue(pictureEffects.value);
-    pictureEffects.depth.style.width = pictureEffects.value + '%';
-    pictureEffects.pinValue.setAttribute('value', pictureEffects.value);
+    pictureEffects.pin.style.left = value + '%';
+    pictureEffects.setValue(value);
+    pictureEffects.depth.style.width = value + '%';
+    pictureEffects.pinValue.setAttribute('value', value);
   };
 
+  // срабатывание функции при нажатии на фильтры
   pictureEffects.toAddClass = function () {
-    document.addEventListener('click', function (evt) {
-      if (evt.target.matches('input[type="radio"]')) {
-        var value = evt.target.getAttribute('value');
-        pictureEffects.activeEffect = value;
-        var classAdd = (value !== pictureEffects.effects.none) ? 'effects__preview--' + value : '';
-        pictureEffects.image.className = classAdd;
-        pictureEffects.setValue(100);
-        pictureEffects.setSliderValue(pictureEffects.pinContainer.getBoundingClientRect().width);
-      }
+    var switches = document.querySelectorAll('.effects__radio');
+    switches.forEach(function (input) {
+      input.addEventListener('click', pictureEffects.onClickSwitch);
     });
   };
 
+  // скрытие отображение слайдера при нажатии на фильтры, применения фильтра
+  pictureEffects.onClickSwitch = function (evt) {
+    var effect = evt.target.getAttribute('value');
+    if (effect === 'none') {
+      pictureEffects.hiddenSlider();
+    } else {
+      pictureEffects.visibleSlider();
+    }
+    pictureEffects.initFilter(effect);
+  };
+
+  // применяется нужный класс исходя их фильтра
+  pictureEffects.initFilter = function (effect) {
+    pictureEffects.activeEffect = effect;
+
+    var filterProperty = getFilterProperty(pictureEffects.activeEffect, pictureEffects.defaultValue);
+    // добавляет нужный класс исходя из эффекта
+    pictureEffects.image.className = filterProperty.name;
+    pictureEffects.setSliderValue(pictureEffects.defaultValue);
+  };
+
+  // скрытие слайдера
   pictureEffects.hiddenSlider = function () {
     pictureEffects.sliderContainer.classList.add('visually-hidden');
   };
 
+  // отображение слайдера
   pictureEffects.visibleSlider = function () {
     pictureEffects.sliderContainer.classList.remove('visually-hidden');
   };
 
+  // функция по переключению эффектов
   pictureEffects.setValue = function (value) {
-    var styleName = pictureEffects.activeEffect;
-    var set = {
-      none: 'none',
-      chrome: value / 100,
-      sepia: value / 100,
-      marvin: value + '%',
-      phobos: value / 100 * 3 + 'px',
-      heat: 1 + 2 * value / 100
-    };
-
-    if (styleName === 'none') {
-      pictureEffects.image.style.filter = null;
-      pictureEffects.hiddenSlider();
-    } else {
-      pictureEffects.image.style.filter = pictureEffects.effects[styleName] + '(' + set[styleName] + ')';
-      pictureEffects.visibleSlider();
-    }
+    var filterProperty = getFilterProperty(value);
+    pictureEffects.image.style.filter = filterProperty.filterProperty;
   };
 
+  // инициализация применения эффектов
   pictureEffects.init = function () {
-    pictureEffects.hiddenSlider();
+    pictureEffects.default();
     this.toAddClass();
     pictureEffects.pin.addEventListener('mousedown', function (evt) {
       pictureEffects.mousedown(evt);
@@ -109,4 +170,9 @@
   };
 
   pictureEffects.init();
+
+  window.effect = {
+    default: pictureEffects.default
+  };
+
 })();
