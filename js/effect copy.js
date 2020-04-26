@@ -1,6 +1,7 @@
 'use strict';
 
 (function () {
+  var sliderValue = 100;
   var getFilterProperty = function (sliderValue) {
     var heat = 1 + 2 * (sliderValue / 100);
     var effects = {
@@ -34,17 +35,17 @@
 
   // инициализация
   var pictureEffects = {
-    // form: document.querySelector('.img-upload__form'),
-    // pinValue: document.querySelector('.effect-level__value'),
-    // sliderContainer: document.querySelector('.effect-level'),
-    // depth: document.querySelector('.effect-level__depth'),
-    // pinContainer: document.querySelector('.effect-level__line'),
+    form: document.querySelector('.img-upload__form'),
+    pin: document.querySelector('.effect-level__pin'),
+    pinValue: document.querySelector('.effect-level__value'),
+    sliderContainer: document.querySelector('.effect-level'),
+    depth: document.querySelector('.effect-level__depth'),
+    pinContainer: document.querySelector('.effect-level__line'),
     image: document.querySelector('.img-upload__preview > img'),
     value: 1,
     defaultValue: 100,
     activeEffect: 'none',
-    activeFilter: null,
-    DEFAULT_EFFECT: 'none'
+    activeFilter: null
   };
 
   // применение значений по умолчанию значение 100% и без эффекта
@@ -63,6 +64,66 @@
     // сбрасывает данные формы
     pictureEffects.form.reset();
 
+    // устанавливает положение слайдера по умолчанию на 100%
+    pictureEffects.setSliderValue(pictureEffects.defaultValue);
+  };
+
+  // передвижение ползунка и передача значения в фукнцию по применению эффектов
+  pictureEffects.mousedown = function (evt) {
+
+    evt.preventDefault();
+    var pinCoordX = this.pin.getBoundingClientRect().left;
+
+    var pinContainerLeft = this.pinContainer.getBoundingClientRect().left;
+    var shiftX = event.clientX - pinCoordX;
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+
+    function onMouseMove() {
+      var newLeft = event.clientX - shiftX - pinContainerLeft;
+      if (newLeft < 0) {
+        newLeft = 0;
+      }
+
+      var maxValue = pictureEffects.pinContainer.getBoundingClientRect().width;
+      if (newLeft > maxValue) {
+        newLeft = maxValue;
+      }
+
+      // значение в % положения слайдера и параметров фильтра
+      var value = Math.floor(newLeft / pictureEffects.pinContainer.getBoundingClientRect().width * 100);
+      sliderValue = value;
+      // устанавливает положение слайдера
+      pictureEffects.setSliderValue(value);
+
+      // устанавливает значение активного фильтра
+      pictureEffects.setValue(value);
+    }
+
+    function onMouseUp() {
+      document.removeEventListener('mouseup', onMouseUp);
+      document.removeEventListener('mousemove', onMouseMove);
+    }
+  };
+
+  //при нажатии
+  pictureEffects.onClickLeft = function (evt) {
+    if (evt.keyCode === 37) {
+      sliderValue -= 10;
+      if (sliderValue < 0) {
+        sliderValue = 0;
+      }
+      pictureEffects.setSliderValue(sliderValue);
+    }
+  }
+
+  // устанавливает позицию слайдера исходя из получаемого значения в %
+  pictureEffects.setSliderValue = function (value) {
+    pictureEffects.pin.style.left = value + '%';
+    pictureEffects.setValue(value);
+    pictureEffects.depth.style.width = value + '%';
+    pictureEffects.pinValue.setAttribute('value', value);
   };
 
   // срабатывание функции при нажатии на фильтры
@@ -92,12 +153,7 @@
     var filterProperty = getFilterProperty(pictureEffects.activeEffect, pictureEffects.defaultValue);
     // добавляет нужный класс исходя из эффекта
     pictureEffects.image.className = filterProperty.name;
-    if (effect === pictureEffects.DEFAULT_EFFECT) {
-      window.slider.default();
-    } else {
-      window.slider.visible();
-      window.slider.initial();
-    }
+    pictureEffects.setSliderValue(pictureEffects.defaultValue);
   };
 
   // скрытие слайдера
@@ -118,16 +174,25 @@
 
   // инициализация применения эффектов
   pictureEffects.init = function () {
+    pictureEffects.pin.setAttribute('tabindex', 0);
 
+
+
+    pictureEffects.pin.addEventListener('focus', function () {
+      document.addEventListener('keydown', pictureEffects.onClickLeft);
+    });
     pictureEffects.default();
     this.toAddClass();
+    pictureEffects.pin.addEventListener('mousedown', function (evt) {
+      pictureEffects.mousedown(evt);
+    });
   };
 
   pictureEffects.init();
 
   window.effect = {
-    default: pictureEffects.default,
-    setValue: pictureEffects.setValue
+    default: pictureEffects.default
+    // activeFilter: pictureEffects.activeFilter
   };
 
 })();

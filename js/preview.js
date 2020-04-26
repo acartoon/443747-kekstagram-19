@@ -4,6 +4,8 @@
 
   var templateComment = document.querySelector('.social__comment');
   var pictureDetail = document.querySelector('.big-picture');
+  var COMMENT_VALUE_STEP = 5;
+
 
   var renderComment = function (template, commentData) {
     var comment = template.cloneNode(true);
@@ -22,6 +24,34 @@
     });
   };
 
+  var initComments = function (render, comments, container) {
+    var bigPictureCommentsLoader = pictureDetail.querySelector('.comments-loader');
+    window.utils.hiddenElement(bigPictureCommentsLoader);
+
+    var commentsToRender = comments.length > COMMENT_VALUE_STEP ? COMMENT_VALUE_STEP : comments.length;
+
+    if (comments.length > COMMENT_VALUE_STEP) {
+      window.utils.visibleElement(bigPictureCommentsLoader);
+
+      bigPictureCommentsLoader.addEventListener('click', onBtnClick);
+    }
+
+
+    renderComments(render, comments.slice(0, commentsToRender), container);
+
+    function onBtnClick(evt) {
+      evt.preventDefault();
+
+      renderComments(render, comments.slice(commentsToRender, commentsToRender + COMMENT_VALUE_STEP), container);
+      commentsToRender += COMMENT_VALUE_STEP;
+
+      if (commentsToRender > comments.length) {
+        window.utils.hiddenElement(bigPictureCommentsLoader);
+        bigPictureCommentsLoader.removeEventListener('click', onBtnClick);
+      }
+    }
+  };
+
   // отрисовывает детальную картинку
   var renderPictureDetail = function (photoData) {
     pictureDetail.querySelector('.big-picture__img > img').setAttribute('src', photoData.url);
@@ -32,18 +62,15 @@
     var commentsContainer = pictureDetail.querySelector('.social__comments');
     commentsContainer.innerHTML = '';
 
-    renderComments(renderComment, photoData.comments, commentsContainer);
+    initComments(renderComment, photoData.comments, commentsContainer);
     // window.utils.onOpenPopup(pictureDetail);
     var modal = new window.Modal(pictureDetail);
     modal.open();
   };
 
   var bigPictureCommentsCount = pictureDetail.querySelector('.social__comment-count');
-  var bigPictureCommentsLoader = pictureDetail.querySelector('.comments-loader');
 
   window.utils.hiddenElement(bigPictureCommentsCount);
-  window.utils.hiddenElement(bigPictureCommentsLoader);
-
 
   window.preview = {
     renderPictureDetail: renderPictureDetail

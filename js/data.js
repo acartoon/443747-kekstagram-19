@@ -5,6 +5,7 @@
   var MAX_COUNT_LIKES = 200;
   var MIN_COUNT_LIKES = 15;
   var MAX_COUNT_AVATAR = 6;
+  var MAX_COUNT_COMMENT = 20;
 
   var messages = [
     'Всё отлично!',
@@ -31,7 +32,7 @@
 
   var getPhotoMock = function () {
     var comment = [];
-    for (var i = 0; i < getRandomNumber(1, 4); i++) {
+    for (var i = 0; i < getRandomNumber(1, MAX_COUNT_COMMENT); i++) {
       comment.push(getCommentMock());
     }
 

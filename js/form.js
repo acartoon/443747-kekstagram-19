@@ -3,78 +3,79 @@
 (function () {
 
   var uploadFile = document.querySelector('.img-upload__input');
-  var uploaImgBlock = document.querySelector('.img-upload__overlay');
-  var modal = new window.Modal(uploaImgBlock);
+  var uploadImgBlock = document.querySelector('.img-upload__overlay');
+  var form = new window.Modal(uploadImgBlock);
 
   uploadFile.addEventListener('change', function () {
-    modal.open();
+    form.open();
+    var initpictireSize = window.pictireSize.init.bind(window.pictireSize.getChangePictureSize);
+    initpictireSize();
   });
 
   var imgUploadFormElement = document.querySelector('.img-upload__form');
 
-  var Form = function (template, func) {
+  var Notice = function (template, onCloseForm) {
     this._template = template;
     this._KEYS = window.utils.KEYS;
-    this._func = func;
+    this._onCloseForm = onCloseForm;
     this._message = template.cloneNode(true);
-    this._btn = this._message.querySelector('.success__button');
+    this._btn = this._message.querySelector('button');
+    this._onKeydown = this._onKeydown.bind(this);
+    this._onClose = this._onClose.bind(this);
+    this._closeMessage = this._closeMessage.bind(this);
+  };
 
-    this.init = function () {
-      this._func();
-      document.body.append(this._message);
-      this._onClose();
-    };
+  Notice.prototype.init = function () {
+    this._onCloseForm();
+    document.body.append(this._message);
+    document.body.classList.add('modal-open');
+    this._message.addEventListener('click', this._onClose);
+    document.addEventListener('keydown', this._onKeydown);
+    this._btn.addEventListener('click', this._closeMessage);
+  };
 
-    this._onClose = function () {
-      this._onKeydown = this._onKeydown.bind(this);
-      this._onClose2 = this._onClose2.bind(this);
-      this._closeMessage = this._closeMessage.bind(this);
-      this._message.addEventListener('click', this._onClose2);
-      document.addEventListener('keydown', this._onKeydown);
-      this._btn.addEventListener('click', this._closeMessage);
-    };
 
-    this._resetForm = function () {
-      document.querySelector('.img-upload__form').reset();
-    };
+  Notice.prototype._closeMessage = function () {
+    this._message.remove();
+    document.body.classList.remove('modal-open');
+    document.removeEventListener('keydown', this._onKeydown);
+    this._message.removeEventListener('click', this._onKeydown);
+    this._btn.removeEventListener('click', this._closeMessage);
+  };
 
-    this._closeMessage = function () {
-      this._message.remove();
-      this._btn.removeEventListener('click', this._closeMessage);
-      this._message.removeEventListener('click', this._onKeydown);
+  Notice.prototype._onClose = function (evt) {
+    if (evt.target.classList.contains('success')) {
+      this._closeMessage();
+    }
+  };
+
+  Notice.prototype._onKeydown = function (evt) {
+    if (evt.key === this._KEYS.ESCAPE || evt.key === this._KEYS.ESC) {
+      this._closeMessage();
       document.removeEventListener('keydown', this._onKeydown);
-    };
-
-    this._onClose2 = function (evt) {
-      if (evt.target.classList.contains('success')) {
-        this._closeMessage();
-      }
-    };
-
-    this._onKeydown = function (evt) {
-      if (evt.key === this._KEYS.ESCAPE || evt.key === this._KEYS.ESC) {
-        this._closeMessage();
-        document.removeEventListener('keydown', this._onKeydown);
-      }
-    };
+    }
   };
 
   function showSuccessMessage() {
     var template = document.querySelector('#success').content.querySelector('.success');
-    var success = new Form(template, modal._close);
+    var success = new Notice(template, form._onClose);
+    imgUploadFormElement.removeEventListener('submit', submit);
     success.init();
   }
 
   function showErrorMessage() {
     var template = document.querySelector('#error').content.querySelector('.error');
-    var error = new Form(template, modal._close);
+    var error = new Notice(template, form._onClose);
     error.init();
   }
 
-  imgUploadFormElement.addEventListener('submit', function (evt) {
+  function submit(evt) {
     evt.preventDefault();
     window.backend.onSend(new FormData(imgUploadFormElement), showSuccessMessage, showErrorMessage);
     window.effect.default();
-  });
+    window.slider.default();
+  }
+
+  imgUploadFormElement.addEventListener('submit', submit);
 
 })();

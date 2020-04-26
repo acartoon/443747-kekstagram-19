@@ -5,14 +5,16 @@
     MAX_COUNT: 5,
     MAX_LENGTH: 20,
     MIN_LENGTH: 2,
+    MAX_LENGTH_TEXTAREA: 140,
     tagsArray: [],
-    HASHTAG_PATTERN: /^#[a-zA-Z0-9\u0400-\u04FF]+$/,
+    HASHTAG_PATTERN: /[a-zA-Z0-9\u0400-\u04FF]+$/,
     hash: '#',
     input: document.querySelector('.text__hashtags'),
+    textarea: document.querySelector('.text__description'),
     mistakes: {
-      firstСharacter: 'Хэш-тег начинается с символа #',
-      hash: 'Символ # может быть только вначале хештега',
-      tagContent: 'Хештеги состоять из букв и чисел и не может содержать пробелы, спецсимволы и тд',
+      firstСharacter: 'Хэш-тег должен начинаться с символа #',
+      hash: 'Хештеги должны разделяться пробелами',
+      tagContent: 'Хештег должен состоять из букв и чисел, а также не может содержать пробелы, спецсимволы и тд',
       minLengtTags: 'Минимальное количество символов может быть не меньшье ' + 2 + ' символов',
       maxLengtTags: 'Максимальное количество символов может быть не больше ' + 20 + ' символов',
       doubleTags: 'Хештеги не могут использоваться дважды',
@@ -22,7 +24,7 @@
   };
 
   validation.splitTags = function (string) {
-    validation.tagsArray = string.toLowerCase().split(' ');
+    validation.tagsArray = string.length > 0 ? string.toLowerCase().split(' ') : [];
   };
 
   // теги начинаются с решетки
@@ -37,7 +39,7 @@
 
   // длина одного тега не больше 20 знаков
   validation.checkMaxLengtTags = function (item) {
-    return item.length < validation.MAX_LENGTH ? true : false;
+    return item.length <= validation.MAX_LENGTH ? true : false;
   };
 
   // длина одного тега не меньше 1 знака
@@ -69,39 +71,58 @@
     }
   };
 
-  validation.chackAll = function (array) {
+  validation.renderErrors = function (elem) {
+    elem.style.border = '2px solid #ce2727';
+  };
+
+  validation.unrenderErrors = function (elem) {
+    elem.style.border = null;
+  };
+
+  validation.checkAll = function (array) {
     if (!validation.checkCountTags(array)) {
       validation.pushErrorMessage(validation.mistakes.maxCountTag);
+      validation.renderErrors(validation.input);
     } else {
       array.forEach(function (item) {
-        if (!validation.checkFirstСharacter(item)) {
-          validation.pushErrorMessage(validation.mistakes.firstСharacter);
-        }
-        if (!validation.checkHashNumber(item)) {
-          validation.pushErrorMessage(validation.mistakes.hash);
-        }
-        if (!validation.checkTagsContent(item)) {
-          validation.pushErrorMessage(validation.mistakes.tagContent);
-        }
-        if (!validation.checkMaxLengtTags(item)) {
-          validation.pushErrorMessage(validation.mistakes.maxLengtTags);
-        }
         if (!validation.checkMinLengtTags(item)) {
           validation.pushErrorMessage(validation.mistakes.minLengtTags);
         }
-      });
-      if (validation.errors.length === 0) {
+
+        if (!validation.checkFirstСharacter(item)) {
+          validation.pushErrorMessage(validation.mistakes.firstСharacter);
+        }
+
+        if (!validation.checkHashNumber(item)) {
+          validation.pushErrorMessage(validation.mistakes.hash);
+        }
+
+        if (!validation.checkMaxLengtTags(item)) {
+          validation.pushErrorMessage(validation.mistakes.maxLengtTags);
+        }
+
+        if (!validation.checkTagsContent(item)) {
+          validation.pushErrorMessage(validation.mistakes.tagContent);
+        }
+
         if (!validation.checkDoubleTags(validation.tagsArray)) {
           validation.pushErrorMessage(validation.mistakes.doubleTags);
         }
+      }); // end foreach
+      if (validation.errors.length === 0 && !validation.checkDoubleTags(validation.tagsArray)) {
+        validation.pushErrorMessage(validation.mistakes.doubleTags);
       }
-    }
+
+      if (validation.errors.length === 0) {
+        validation.errors = [];
+      }
+    } // end else
   };
 
   validation.getValue = function () {
-    var inputValue = validation.input.value;
+    var inputValue = validation.input.value.trim();
     validation.splitTags(inputValue);
-    validation.chackAll(validation.tagsArray);
+    validation.checkAll(validation.tagsArray);
   };
 
   validation.init = function () {
@@ -109,13 +130,24 @@
       validation.errors = [];
       validation.getValue();
       if (validation.errors.length !== 0) {
-        validation.input.setCustomValidity(validation.errors.join('\n'));
+        validation.input.setCustomValidity(validation.errors.join('. \n'));
+        validation.renderErrors(validation.input);
       } else {
+        validation.unrenderErrors(validation.input);
         validation.input.setCustomValidity('');
+      }
+    });
+
+    validation.textarea.addEventListener('keyup', function () {
+      if (validation.textarea.value.length > validation.MAX_LENGTH_TEXTAREA) {
+        validation.textarea.setCustomValidity('Масимальная длина поля не более ' + validation.MAX_LENGTH_TEXTAREA + ' символов');
+        validation.renderErrors(validation.textarea);
+      } else {
+        validation.textarea.setCustomValidity('');
+        validation.unrenderErrors(validation.textarea);
       }
     });
   };
 
   validation.init();
 })();
-

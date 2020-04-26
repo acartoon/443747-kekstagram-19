@@ -2,13 +2,13 @@
 
 (function () {
 
-  var uploadFile = document.querySelector('.img-upload__input');
-  var uploaImgBlock = document.querySelector('.img-upload__overlay');
-  var modal = new window.Modal(uploaImgBlock);
+  // var uploadFile = document.querySelector('.img-upload__input');
+  // var uploaImgBlock = document.querySelector('.img-upload__overlay');
+  // var modal = new window.Modal(uploaImgBlock);
 
-  uploadFile.addEventListener('change', function () {
-    modal.open();
-  });
+  // uploadFile.addEventListener('change', function () {
+  //   modal.open();
+  // });
 
   var getChangePictureSize = {
     scaleСontrolValue: document.querySelector('.scale__control--value'),
@@ -19,20 +19,13 @@
     MAX_STEP: 100,
     MIN_STEP: 25,
     initialValue: 100,
-    STATES: {
-      smaller: 'smaller',
-      bigger: 'bigger'
-    }
+    defaultValue: 100,
   };
 
-  getChangePictureSize.onClick = function (btn, state) {
-    btn.addEventListener('click', function () {
-      getChangePictureSize.changeSizeImg(state);
-    });
-  };
+  getChangePictureSize.changeSizeImg = function (evt) {
 
-  getChangePictureSize.changeSizeImg = function (state) {
-    this.initialValue = (state === this.STATES.smaller) ? this.initialValue - this.STEP_CHANGE : this.initialValue + this.STEP_CHANGE;
+    var target = evt.target;
+    this.initialValue = (target === this.btnSmaller) ? this.initialValue - this.STEP_CHANGE : this.initialValue + this.STEP_CHANGE;
     if (this.initialValue > this.MAX_STEP) {
       this.initialValue = this.MAX_STEP;
     }
@@ -41,15 +34,46 @@
       this.initialValue = this.MIN_STEP;
     }
 
-    this.scaleСontrolValue.value = this.initialValue + '%';
+    this.setValue(this.initialValue);
+    // this.scaleСontrolValue.setAttribute('value', this.initialValue + '%');
+    // this.scaleСontrolValue.value = this.initialValue + '%';
     this.image.style.transform = 'scale(' + this.initialValue / 100 + ')';
   };
 
-  getChangePictureSize.init = function () {
-    this.scaleСontrolValue.value = this.initialValue + '%';
-    this.onClick(this.btnSmaller, this.STATES.smaller);
-    this.onClick(this.btnBigger, this.STATES.bigger);
+
+  getChangePictureSize.default = function () {
+    this.setValue(this.defaultValue);
   };
 
-  getChangePictureSize.init();
+  getChangePictureSize.setValue = function (value) {
+    this.scaleСontrolValue.setAttribute('value', value + '%');
+    this.scaleСontrolValue.value = value + '%';
+  };
+
+
+
+  getChangePictureSize.init = function () {
+    getChangePictureSize.default();
+
+    getChangePictureSize.changeSizeImg = getChangePictureSize.changeSizeImg.bind(this);
+    getChangePictureSize.btnSmaller.addEventListener('click', getChangePictureSize.changeSizeImg);
+    getChangePictureSize.btnBigger.addEventListener('click', getChangePictureSize.changeSizeImg);
+  };
+
+  getChangePictureSize.removeListener = function () {
+    getChangePictureSize.btnSmaller.removeEventListener('click', getChangePictureSize.changeSizeImg);
+    getChangePictureSize.btnBigger.removeEventListener('click', getChangePictureSize.changeSizeImg);
+  };
+
+  getChangePictureSize.reset = function () {
+    getChangePictureSize.default();
+    getChangePictureSize.removeListener();
+  };
+
+  window.pictireSize = {
+    reset: getChangePictureSize.reset,
+    init: getChangePictureSize.init,
+    getChangePictureSize: getChangePictureSize
+  };
+
 })();
