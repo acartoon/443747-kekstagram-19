@@ -4,14 +4,12 @@
 
   var container = document.querySelector('.pictures');
 
-  var renderPhoto = function (photoData) {
+  var render = function (photoData) {
     photoData.forEach(function (photo) {
-      var photoBlock = window.picture.renderPhoto(photo);
+      var photoBlock = new window.PhotoGallery(photo).init();
       container.append(photoBlock);
     });
   };
 
-  window.gallery = {
-    renderPhoto: renderPhoto,
-  };
+  window.renderGallery = render;
 })();

@@ -2,59 +2,39 @@
 
 (function () {
 
-  var KEYS = {
-    ESCAPE: 'Escape',
-    ESC: 'Esc'
-  };
-
-  window.Modal = function (window, buttonClass) {
+  function Modal(window) {
     this._window = window;
-    this._buttonClass = buttonClass;
-    this.KEYS = KEYS;
-    this._onClose = this._onClose.bind(this);
     this._closeBtn = this._window.querySelector('.cancel');
-    this._inputHash = document.querySelector('.text__hashtags');
-    this._inputDesc = document.querySelector('.text__description');
 
+    this.onBtnCloseClick = this.onBtnCloseClick.bind(this);
+    this._onKeyEscDown = this._onKeyEscDown.bind(this);
+    this._onDocumentEscDown = this._onDocumentEscDown.bind(this);
+  }
+
+  Modal.prototype._onDocumentEscDown = function () {
+    document.addEventListener('keydown', this._onKeyEscDown);
   };
 
-  window.Modal.prototype._closeModalOnKeydown = function () {
-    document.addEventListener('keydown', this._onKeydown);
-  };
-
-  window.Modal.prototype.open = function () {
+  Modal.prototype.open = function () {
     this._window.classList.remove('hidden');
     document.body.classList.add('modal-open');
-    this._closeBtn.addEventListener('click', this._onClose);
-    this._onKeydown = this._onKeydown.bind(this);
-    document.addEventListener('keydown', this._onKeydown);
-
-    this._inputHash.addEventListener('focus', this.removeClose.bind(this));
-    this._inputDesc.addEventListener('focus', this.removeClose.bind(this));
-    this._inputHash.addEventListener('blur', this._closeModalOnKeydown.bind(this));
-    this._inputDesc.addEventListener('blur', this._closeModalOnKeydown.bind(this));
+    document.addEventListener('keydown', this._onKeyEscDown);
+    this._closeBtn.addEventListener('click', this.onBtnCloseClick);
   };
 
-  window.Modal.prototype.removeClose = function () {
-    document.removeEventListener('keydown', this._onKeydown);
-  };
-
-  window.Modal.prototype._onKeydown = function (evt) {
-    if (evt.key === KEYS.ESCAPE || evt.key === KEYS.ESC) {
-      this._onClose();
-      document.removeEventListener('keydown', this._onKeydown);
+  Modal.prototype._onKeyEscDown = function (evt) {
+    if (evt.key === window.utils.KEYS.ESCAPE || evt.key === window.utils.KEYS.ESC) {
+      this.onBtnCloseClick();
+      document.removeEventListener('keydown', this._onKeyEscDown);
     }
   };
 
-  window.Modal.prototype._onClose = function () {
-    window.effect.default();
-    window.slider.default();
-
-    window.pictireSize.reset();
-    document.querySelector('.img-upload__preview > img').removeAttribute('style');
+  Modal.prototype.onBtnCloseClick = function () {
+    this._closeBtn.removeEventListener('click', this.onBtnCloseClick);
     this._window.classList.add('hidden');
     document.body.classList.remove('modal-open');
-    this._closeBtn.removeEventListener('click', this._onClose);
   };
+
+  window.Modal = Modal;
 
 })();

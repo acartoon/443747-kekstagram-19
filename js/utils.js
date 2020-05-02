@@ -2,15 +2,19 @@
 
 (function () {
 
-  var KEYS = {
+  var KEYS_CODE = {
     ESCAPE: 'Escape',
-    ESC: 'Esc'
+    ESC: 'Esc',
+    ARROW_LEFT: 'ArrowLeft',
+    ARROW_RIGHT: 'ArrowRight',
   };
 
-  // добавляет класс hidden
+  var FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
+
   var hiddenElement = function (element) {
     element.classList.add('hidden');
   };
+
   var visibleElement = function (element) {
     element.classList.remove('hidden');
   };
@@ -30,9 +34,9 @@
     return result;
   };
 
-
   window.utils = {
-    KEYS: KEYS,
+    KEYS: KEYS_CODE,
+    FILE_TYPES: FILE_TYPES,
     hiddenElement: hiddenElement,
     visibleElement: visibleElement,
     getRandomElements: getRandomElements

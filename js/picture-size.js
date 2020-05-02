@@ -2,14 +2,6 @@
 
 (function () {
 
-  // var uploadFile = document.querySelector('.img-upload__input');
-  // var uploaImgBlock = document.querySelector('.img-upload__overlay');
-  // var modal = new window.Modal(uploaImgBlock);
-
-  // uploadFile.addEventListener('change', function () {
-  //   modal.open();
-  // });
-
   var getChangePictureSize = {
     scaleСontrolValue: document.querySelector('.scale__control--value'),
     btnSmaller: document.querySelector('.scale__control--smaller'),
@@ -22,52 +14,53 @@
     defaultValue: 100,
   };
 
-  getChangePictureSize.changeSizeImg = function (evt) {
-
-    var target = evt.target;
-    this.initialValue = (target === this.btnSmaller) ? this.initialValue - this.STEP_CHANGE : this.initialValue + this.STEP_CHANGE;
-    if (this.initialValue > this.MAX_STEP) {
-      this.initialValue = this.MAX_STEP;
-    }
-
-    if (this.initialValue < this.MIN_STEP) {
-      this.initialValue = this.MIN_STEP;
-    }
-
-    this.setValue(this.initialValue);
-    // this.scaleСontrolValue.setAttribute('value', this.initialValue + '%');
-    // this.scaleСontrolValue.value = this.initialValue + '%';
-    this.image.style.transform = 'scale(' + this.initialValue / 100 + ')';
-  };
-
-
-  getChangePictureSize.default = function () {
-    this.setValue(this.defaultValue);
-  };
-
   getChangePictureSize.setValue = function (value) {
-    this.scaleСontrolValue.setAttribute('value', value + '%');
-    this.scaleСontrolValue.value = value + '%';
+    getChangePictureSize.scaleСontrolValue.setAttribute('value', value + '%');
+    getChangePictureSize.scaleСontrolValue.value = value + '%';
   };
 
+  getChangePictureSize.onBtnSmallerClick = function () {
+    getChangePictureSize.initialValue = getChangePictureSize.initialValue - getChangePictureSize.STEP_CHANGE;
+    if (getChangePictureSize.initialValue < getChangePictureSize.MIN_STEP) {
+      getChangePictureSize.initialValue = getChangePictureSize.MIN_STEP;
+    }
+    getChangePictureSize.setValue(getChangePictureSize.initialValue);
+    getChangePictureSize.image.style.transform = 'scale(' + getChangePictureSize.initialValue / 100 + ')';
+  };
 
+  getChangePictureSize.onBtnBiggerClick = function () {
+    getChangePictureSize.initialValue = getChangePictureSize.initialValue + getChangePictureSize.STEP_CHANGE;
+
+    if (getChangePictureSize.initialValue > getChangePictureSize.MAX_STEP) {
+      getChangePictureSize.initialValue = getChangePictureSize.MAX_STEP;
+    }
+
+    getChangePictureSize.setValue(getChangePictureSize.initialValue);
+    getChangePictureSize.image.style.transform = 'scale(' + getChangePictureSize.initialValue / 100 + ')';
+  };
+
+  getChangePictureSize.defaultParams = function () {
+    getChangePictureSize.setValue(getChangePictureSize.defaultValue);
+  };
 
   getChangePictureSize.init = function () {
-    getChangePictureSize.default();
+    getChangePictureSize.defaultParams();
 
-    getChangePictureSize.changeSizeImg = getChangePictureSize.changeSizeImg.bind(this);
-    getChangePictureSize.btnSmaller.addEventListener('click', getChangePictureSize.changeSizeImg);
-    getChangePictureSize.btnBigger.addEventListener('click', getChangePictureSize.changeSizeImg);
+    getChangePictureSize.onBtnSmallerClick = getChangePictureSize.onBtnSmallerClick.bind(this);
+    getChangePictureSize.onBtnBiggerClick = getChangePictureSize.onBtnBiggerClick.bind(this);
+
+    getChangePictureSize.btnSmaller.addEventListener('click', getChangePictureSize.onBtnSmallerClick);
+    getChangePictureSize.btnBigger.addEventListener('click', getChangePictureSize.onBtnBiggerClick);
   };
 
-  getChangePictureSize.removeListener = function () {
-    getChangePictureSize.btnSmaller.removeEventListener('click', getChangePictureSize.changeSizeImg);
-    getChangePictureSize.btnBigger.removeEventListener('click', getChangePictureSize.changeSizeImg);
+  getChangePictureSize.removeListeners = function () {
+    getChangePictureSize.btnSmaller.removeEventListener('click', getChangePictureSize.onBtnSmallerClick);
+    getChangePictureSize.btnBigger.removeEventListener('click', getChangePictureSize.onBtnBiggerClick);
   };
 
   getChangePictureSize.reset = function () {
-    getChangePictureSize.default();
-    getChangePictureSize.removeListener();
+    getChangePictureSize.defaultParams();
+    getChangePictureSize.removeListeners();
   };
 
   window.pictireSize = {
@@ -75,5 +68,4 @@
     init: getChangePictureSize.init,
     getChangePictureSize: getChangePictureSize
   };
-
 })();
