@@ -51,7 +51,6 @@
     pictureEffects.image.classList = '';
     pictureEffects.image.style.filter = null;
     pictureEffects.image.src = '';
-    // pictureEffects.form.reset();
   };
 
   // применение фильтров на изображение

@@ -63,7 +63,7 @@
     var template = document.querySelector('#error').content.querySelector('.error');
     var error = new window.Notice(template);
     error.init();
-  }
+  };
 
   window.backend = {
     load: load,
