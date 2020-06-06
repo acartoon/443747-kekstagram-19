@@ -125,29 +125,41 @@
     validation.checkAll(validation.tagsArray);
   };
 
-  validation.init = function () {
-    validation.input.addEventListener('keyup', function () {
-      validation.errors = [];
-      validation.getValue();
-      if (validation.errors.length !== 0) {
-        validation.input.setCustomValidity(validation.errors.join('. \n'));
-        validation.renderErrors(validation.input);
-      } else {
-        validation.unrenderErrors(validation.input);
-        validation.input.setCustomValidity('');
-      }
-    });
-
-    validation.textarea.addEventListener('keyup', function () {
-      if (validation.textarea.value.length > validation.MAX_LENGTH_TEXTAREA) {
-        validation.textarea.setCustomValidity('Масимальная длина поля не более ' + validation.MAX_LENGTH_TEXTAREA + ' символов');
-        validation.renderErrors(validation.textarea);
-      } else {
-        validation.textarea.setCustomValidity('');
-        validation.unrenderErrors(validation.textarea);
-      }
-    });
+  validation.onTextAreaKeyup = function () {
+    if (validation.textarea.value.length > validation.MAX_LENGTH_TEXTAREA) {
+      validation.textarea.setCustomValidity('Масимальная длина поля не более ' + validation.MAX_LENGTH_TEXTAREA + ' символов');
+      validation.renderErrors(validation.textarea);
+    } else {
+      validation.textarea.setCustomValidity('');
+      validation.unrenderErrors(validation.textarea);
+    }
   };
 
-  validation.init();
+  validation.onHashtagKeyup = function () {
+    validation.errors = [];
+    validation.getValue();
+    if (validation.errors.length !== 0) {
+      validation.input.setCustomValidity(validation.errors.join('. \n'));
+      validation.renderErrors(validation.input);
+    } else {
+      validation.unrenderErrors(validation.input);
+      validation.input.setCustomValidity('');
+    }
+  };
+
+  validation.init = function () {
+    validation.input.addEventListener('keyup', validation.onHashtagKeyup);
+    validation.textarea.addEventListener('keyup', validation.onTextAreaKeyup);
+  };
+
+  validation.reset = function () {
+    validation.textarea.removeEventListener('keyup', validation.onTextAreaKeyup);
+    validation.input.removeEventListener('keyup', validation.onHashtagkeyup);
+  };
+
+  window.validation = {
+    init: validation.init,
+    reset: validation.reset
+  };
+
 })();

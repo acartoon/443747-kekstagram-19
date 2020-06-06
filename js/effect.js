@@ -1,7 +1,21 @@
 'use strict';
 
 (function () {
-  var getFilterProperty = function (sliderValue) {
+
+  var pictureEffects = {
+    form: document.querySelector('.img-upload__form'),
+    sliderContainer: document.querySelector('.effect-level'),
+    depth: document.querySelector('.effect-level__depth'),
+    image: document.querySelector('.img-upload__preview > img'),
+    switches: document.querySelectorAll('.effects__radio'),
+    value: 1,
+    defaultValue: 100,
+    activeEffect: 'none',
+    activeFilter: null,
+    DEFAULT_EFFECT: 'none'
+  };
+
+  pictureEffects.getFilterProperty = function (sliderValue) {
     var heat = 1 + 2 * (sliderValue / 100);
     var effects = {
       none: {
@@ -32,102 +46,64 @@
     return effects[pictureEffects.activeEffect];
   };
 
-  // инициализация
-  var pictureEffects = {
-    // form: document.querySelector('.img-upload__form'),
-    // pinValue: document.querySelector('.effect-level__value'),
-    // sliderContainer: document.querySelector('.effect-level'),
-    // depth: document.querySelector('.effect-level__depth'),
-    // pinContainer: document.querySelector('.effect-level__line'),
-    image: document.querySelector('.img-upload__preview > img'),
-    value: 1,
-    defaultValue: 100,
-    activeEffect: 'none',
-    activeFilter: null,
-    DEFAULT_EFFECT: 'none'
-  };
-
-  // применение значений по умолчанию значение 100% и без эффекта
-  pictureEffects.default = function () {
-
-    // скрывает слайдер
-    pictureEffects.hiddenSlider();
-
-    // удаляет класс со стилями
+  // состояние по умолчанию
+  pictureEffects.defaultState = function () {
     pictureEffects.image.classList = '';
-    // очищает стиль фильтра
     pictureEffects.image.style.filter = null;
-    // очищает изображение
     pictureEffects.image.src = '';
-
-    // сбрасывает данные формы
-    pictureEffects.form.reset();
-
   };
 
-  // срабатывание функции при нажатии на фильтры
-  pictureEffects.toAddClass = function () {
-    var switches = document.querySelectorAll('.effects__radio');
-    switches.forEach(function (input) {
-      input.addEventListener('click', pictureEffects.onClickSwitch);
-    });
-  };
-
-  // скрытие отображение слайдера при нажатии на фильтры, применения фильтра
+  // применение фильтров на изображение
   pictureEffects.onClickSwitch = function (evt) {
     var effect = evt.target.getAttribute('value');
     pictureEffects.activeFilter = evt.target;
+
     if (effect === 'none') {
-      pictureEffects.hiddenSlider();
+      window.slider.hide();
     } else {
-      pictureEffects.visibleSlider();
+      window.slider.visible();
     }
-    pictureEffects.initFilter(effect);
+    pictureEffects.applyFilter(effect);
   };
 
-  // применяется нужный класс исходя из фильтра
-  pictureEffects.initFilter = function (effect) {
+  // применяется нужный класс исходя из фильтра / отображать скрывать фильтр
+  pictureEffects.applyFilter = function (effect) {
     pictureEffects.activeEffect = effect;
 
-    var filterProperty = getFilterProperty(pictureEffects.activeEffect, pictureEffects.defaultValue);
-    // добавляет нужный класс исходя из эффекта
+    var filterProperty = pictureEffects.getFilterProperty(pictureEffects.activeEffect);
     pictureEffects.image.className = filterProperty.name;
     if (effect === pictureEffects.DEFAULT_EFFECT) {
       window.slider.default();
     } else {
       window.slider.visible();
-      window.slider.initial();
+      window.slider.initialPosition();
     }
   };
 
-  // скрытие слайдера
-  pictureEffects.hiddenSlider = function () {
-    pictureEffects.sliderContainer.classList.add('visually-hidden');
-  };
-
-  // отображение слайдера
-  pictureEffects.visibleSlider = function () {
-    pictureEffects.sliderContainer.classList.remove('visually-hidden');
-  };
-
-  // функция по переключению эффектов
-  pictureEffects.setValue = function (value) {
-    var filterProperty = getFilterProperty(value);
+  // применение насыщенности фильтра
+  pictureEffects.applyFilterSaturation = function (value) {
+    var filterProperty = pictureEffects.getFilterProperty(value);
     pictureEffects.image.style.filter = filterProperty.filterProperty;
   };
 
   // инициализация применения эффектов
-  pictureEffects.init = function () {
-
-    pictureEffects.default();
-    this.toAddClass();
+  pictureEffects.reset = function () {
+    pictureEffects.switches.forEach(function (input) {
+      input.removeEventListener('click', pictureEffects.onClickSwitch);
+    });
+    pictureEffects.defaultState();
+    pictureEffects.form.reset();
   };
 
-  pictureEffects.init();
+  pictureEffects.init = function () {
+    pictureEffects.switches.forEach(function (input) {
+      input.addEventListener('click', pictureEffects.onClickSwitch);
+    });
+  };
 
   window.effect = {
-    default: pictureEffects.default,
-    setValue: pictureEffects.setValue
+    reset: pictureEffects.reset,
+    init: pictureEffects.init,
+    applyFilterSaturation: pictureEffects.applyFilterSaturation
   };
-
 })();

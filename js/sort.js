@@ -1,78 +1,89 @@
 'use strict';
 
 (function () {
-  var CLASS_ACTIVE = 'img-filters__button--active';
-  var activeBtn = document.querySelector('.' + CLASS_ACTIVE);
-  var filterContainer = document.querySelector('.img-filters');
 
-  var onFinterActive = function () {
-    filterContainer.classList.remove('img-filters--inactive');
+  function Sort(data) {
+    this._data = data;
+    this._CLASS_ACTIVE = 'img-filters__button--active';
+    this._activeBtn = document.querySelector('.' + this._CLASS_ACTIVE);
+    this._filterContainer = document.querySelector('.img-filters');
+    this._buttons = document.querySelectorAll('.img-filters__form > button');
+    this._onClick = this._onClick.bind(this);
+    this._COUNT_PHOTO = 10;
+  }
+
+  Sort.prototype._showSortBtn = function () {
+    this._filterContainer.classList.remove('img-filters--inactive');
   };
 
-  onFinterActive();
-
-  window.filter = {
-    onFinterActive: onFinterActive
-  };
-
-  // функция при нажатии на кнопки сортировки выполняет код
-  var buttons = document.querySelectorAll('.img-filters__form > button');
-
-  var getRandomPhoto = function (data, count) {
-
+  Sort.prototype._getRandomPhoto = function (data, count) {
     var randomArray = window.utils.getRandomElements(count, 1, data.length - 1);
 
-    var test = randomArray.reduce(function (array, item) {
+    return randomArray.reduce(function (array, item) {
       array.push(data[item]);
       return array;
     }, []);
-    return test;
   };
 
-  var getSortPhoto = function (data) {
+  Sort.prototype._getDiscussedPhoto = function (data) {
     return data.slice().sort(function (a, b) {
       return b.comments.length - a.comments.length;
     });
   };
 
-
-  var getFilter = function (data, filterType) {
-    var set = {
-      'filter-default': data,
-      'filter-random': getRandomPhoto(data, 10),
-      'filter-discussed': getSortPhoto(data)
+  Sort.prototype._getSortPhoto = function (filterType) {
+    var setFilter = {
+      'filter-default': this._data,
+      'filter-random': this._getRandomPhoto(this._data, this._COUNT_PHOTO),
+      'filter-discussed': this._getDiscussedPhoto(this._data)
     };
-    return set[filterType];
+    return setFilter[filterType];
   };
 
-  var removeGallery = function () {
+  Sort.prototype._clearGallery = function () {
     var pictures = document.querySelectorAll('.pictures .picture');
     pictures.forEach(function (picture) {
       picture.remove();
     });
   };
 
-  var getSort = window.debounce(function (data) {
-    buttons.forEach(function (button) {
-      sort(data, button);
-    });
+  Sort.prototype.init = function () {
+    this._showSortBtn();
+
+    this._buttons.forEach(function (btn) {
+      this._sort(btn);
+    }.bind(this));
+  };
+
+  Sort.prototype._sort = function (button) {
+    button.addEventListener('click', function (evt) {
+      this._onClick(this, evt);
+    }.bind(this));
+  };
+
+  Sort.prototype._onClick = window.debounce(function (context, evt) {
+    context._applySort(evt);
   });
 
-  var sort = function (data, button) {
-    button.addEventListener('click', function () {
-      activeBtn.classList.remove(CLASS_ACTIVE);
-      activeBtn = button;
-      button.classList.add(CLASS_ACTIVE);
-      var filterType = button.getAttribute('id');
-      removeGallery();
-      window.gallery.renderPhoto(getFilter(data, filterType));
-      console.log(getFilter(data, filterType))
-    });
+  Sort.prototype._changeActiveBtn = function (activeBtn) {
+    this._activeBtn.classList.remove(this._CLASS_ACTIVE);
+    this._activeBtn = activeBtn;
+    this._activeBtn.classList.add(this._CLASS_ACTIVE);
   };
 
-
-  window.sort = {
-    getSort: getSort,
+  Sort.prototype._renderPhoto = function (filterType) {
+    this._clearGallery();
+    var dataSort = this._getSortPhoto(filterType);
+    window.renderGallery(dataSort);
   };
+
+  Sort.prototype._applySort = function (evt) {
+    evt.preventDefault();
+    this._changeActiveBtn(evt.target);
+    var filterType = this._activeBtn.getAttribute('id');
+    this._renderPhoto(filterType);
+  };
+
+  window.Sort = Sort;
 
 })();

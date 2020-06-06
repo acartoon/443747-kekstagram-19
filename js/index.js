@@ -2,6 +2,16 @@
 
 (function () {
 
+  var uploadFile = document.querySelector('.img-upload__input');
+  var uploadImgBlock = document.querySelector('.img-upload__overlay');
+  var uploadImage = new window.UploadImgModal(uploadImgBlock);
+
+  // инициализация открытия модального окна загрузки фото
+  uploadFile.addEventListener('change', function () {
+    window.uploadFile();
+    uploadImage.init();
+  });
+
   var errorHandler = function (errorMessage) {
     var node = document.createElement('div');
     node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: red; padding: 20px 0';
@@ -15,17 +25,14 @@
   };
 
 
-  var data = [];
-
   var onLoadHandler = function (photoData) {
-    data = photoData;
-    console.log(data)
-    window.gallery.renderPhoto(data);
-    window.sort.getSort(data);
+    var data = photoData;
+    window.renderGallery(data);
+    var sort = new window.Sort(data);
+    sort.init();
   };
 
-  onLoadHandler(window.data.photosMock);
-  // window.backend.load(onLoadHandler, errorHandler);
-
+  // onLoadHandler(window.data.photosMock);
+  window.backend.load(onLoadHandler, errorHandler);
 
 })();

@@ -16,38 +16,40 @@
     STEP_ONCLICK: 10,
     MIN_VALUE: 0,
     MAX_VALUE: 100,
+    KEYS: {
+      leftArrow: 37,
+
+    }
   };
 
   slider.defaultValue = slider.MAX_VALUE;
   // применение значений по умолчанию значение 100% и без эффекта
   slider.sliderValue = slider.defaultValue;
 
-  slider.initial = function () {
+  slider.initialPositionSlider = function () {
     // устанавливает положение слайдера по умолчанию на 100%
-    slider.setSliderValue(slider.defaultValue);
-  }
+    slider.updateSliderPosition(slider.defaultValue);
+  };
 
   // применение значений по умолчанию значение 100% и без эффекта
   slider.default = function () {
-    // скрывает слайдер
-    slider.hiddenSlider();
-    slider.initial();
+    slider.hideSlider();
+    slider.initialPositionSlider();
   };
 
   // передвижение ползунка и передача значения в фукнцию по применению эффектов
   slider.mousedown = function (evt) {
-
     evt.preventDefault();
-    var pinCoordX = this.pin.getBoundingClientRect().left;
+    var pinCoordX = slider.pin.getBoundingClientRect().left;
+    var shiftX = evt.clientX - pinCoordX;
 
-    var pinContainerLeft = this.pinContainer.getBoundingClientRect().left;
-    var shiftX = event.clientX - pinCoordX;
+    var pinContainerLeft = slider.pinContainer.getBoundingClientRect().left;
 
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
 
-    function onMouseMove() {
-      var newLeft = event.clientX - shiftX - pinContainerLeft;
+    function onMouseMove(event) {
+      var newLeft = event.pageX - shiftX - pinContainerLeft;
       if (newLeft < slider.MIN_VALUE) {
         newLeft = slider.MIN_VALUE;
       }
@@ -61,43 +63,38 @@
       var value = Math.floor(newLeft / slider.pinContainer.getBoundingClientRect().width * slider.MAX_VALUE);
       slider.sliderValue = value;
       // устанавливает положение слайдера
-      slider.setSliderValue(value);
-
-      // устанавливает значение активного фильтра
-      window.effect.setValue(value);
+      slider.updateSliderPosition(value);
     }
 
     function onMouseUp() {
+      slider.pin.focus();
       document.removeEventListener('mouseup', onMouseUp);
       document.removeEventListener('mousemove', onMouseMove);
     }
   };
 
   // при нажатии
-  slider.onClick = function (evt) {
-    if (evt.keyCode === 37) {
-      slider.sliderValue = (slider.sliderValue <= slider.MIN_VALUE) ? slider.MIN_VALUE : slider.sliderValue - slider.STEP_ONCLICK;
-      // sliderValue -= STEP_ONCLICK;
-      // if (sliderValue < 0) {
-      //   sliderValue = 0;
-      // }
-    } else if (evt.keyCode === 39) {
-      slider.sliderValue = (slider.sliderValue >= slider.MAX_VALUE) ? slider.MAX_VALUE : slider.sliderValue + slider.STEP_ONCLICK;
+  slider.onClickArrows = function (evt) {
+    if (evt.key === window.utils.KEYS.ARROW_LEFT) {
+      var stepBack = slider.sliderValue - slider.STEP_ONCLICK;
+      slider.sliderValue = (stepBack <= slider.MIN_VALUE) ? slider.MIN_VALUE : stepBack;
+    } else if (evt.key === window.utils.KEYS.ARROW_RIGHT) {
+      var stepForward = slider.sliderValue + slider.STEP_ONCLICK;
+      slider.sliderValue = (stepForward >= slider.MAX_VALUE) ? slider.MAX_VALUE : stepForward;
     }
-    slider.setSliderValue(slider.sliderValue);
-  }
+    slider.updateSliderPosition(slider.sliderValue);
+  };
 
-  // устанавливает позицию слайдера исходя из получаемого значения в %
-  slider.setSliderValue = function (value) {
+  // обновление позиции слайдера исходя из получаемого значения
+  slider.updateSliderPosition = function (value) {
     slider.pin.style.left = value + '%';
-    window.effect.setValue(value);
+    window.effect.applyFilterSaturation(value);
     slider.depth.style.width = value + '%';
     slider.pinValue.setAttribute('value', value);
   };
 
-
   // скрытие слайдера
-  slider.hiddenSlider = function () {
+  slider.hideSlider = function () {
     slider.sliderContainer.classList.add('visually-hidden');
   };
 
@@ -106,25 +103,31 @@
     slider.sliderContainer.classList.remove('visually-hidden');
   };
 
-  // инициализация применения эффектов
-  slider.init = function () {
-    slider.pin.setAttribute('tabindex', 0);
-    slider.pin.addEventListener('focus', function () {
-      document.addEventListener('keydown', slider.onClick);
-    });
-    slider.default();
-    slider.pin.addEventListener('mousedown', function (evt) {
-      slider.mousedown(evt);
-    });
+  slider.onPinFocus = function () {
+    document.addEventListener('keydown', slider.onClickArrows);
   };
 
-  slider.init();
+  // инициализация применения эффектов
+  slider.init = function () {
+    slider.default();
+    slider.pin.setAttribute('tabindex', 0);
+    slider.mousedown = slider.mousedown.bind(this);
+    slider.pin.addEventListener('focus', slider.onPinFocus);
+    slider.pin.addEventListener('mousedown', slider.mousedown);
+  };
+
+  slider.reset = function () {
+    slider.default();
+    slider.pin.removeEventListener('focus', slider.onPinFocus);
+    slider.pin.removeEventListener('mousedown', slider.mousedown);
+  };
 
   window.slider = {
     default: slider.default,
     init: slider.init,
-    hide: slider.hiddenSlider,
+    hide: slider.hideSlider,
     visible: slider.visibleSlider,
-    initial: slider.initial
+    initialPosition: slider.initialPositionSlider,
+    reset: slider.reset
   };
 })();
