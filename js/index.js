@@ -32,7 +32,7 @@
     sort.init();
   };
 
-  // onLoadHandler(window.data.photosMock);
+  onLoadHandler(window.data.photosMock);
   window.backend.load(onLoadHandler, errorHandler);
 
 })();

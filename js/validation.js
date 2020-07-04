@@ -24,7 +24,8 @@
   };
 
   validation.splitTags = function (string) {
-    validation.tagsArray = string.length > 0 ? string.toLowerCase().split(' ') : [];
+    var tagsArray = string.length > 0 ? string.toLowerCase().split(' ') : [];
+    return tagsArray;
   };
 
   // теги начинаются с решетки
@@ -79,12 +80,12 @@
     elem.style.border = null;
   };
 
-  validation.checkAll = function (array) {
-    if (!validation.checkCountTags(array)) {
+  validation.checkAll = function (tagsArray) {
+    if (!validation.checkCountTags(tagsArray)) {
       validation.pushErrorMessage(validation.mistakes.maxCountTag);
       validation.renderErrors(validation.input);
     } else {
-      array.forEach(function (item) {
+      tagsArray.forEach(function (item) {
         if (!validation.checkMinLengtTags(item)) {
           validation.pushErrorMessage(validation.mistakes.minLengtTags);
         }
@@ -105,24 +106,24 @@
           validation.pushErrorMessage(validation.mistakes.tagContent);
         }
 
-        if (!validation.checkDoubleTags(validation.tagsArray)) {
+        if (!validation.checkDoubleTags(tagsArray)) {
           validation.pushErrorMessage(validation.mistakes.doubleTags);
         }
       }); // end foreach
-      if (validation.errors.length === 0 && !validation.checkDoubleTags(validation.tagsArray)) {
+      if (validation.errors.length === 0 && !validation.checkDoubleTags(tagsArray)) {
         validation.pushErrorMessage(validation.mistakes.doubleTags);
       }
 
-      if (validation.errors.length === 0) {
-        validation.errors = [];
-      }
+      // if (validation.errors.length === 0) {
+      //   validation.errors = [];
+      // }
     } // end else
   };
 
   validation.getValue = function () {
     var inputValue = validation.input.value.trim();
-    validation.splitTags(inputValue);
-    validation.checkAll(validation.tagsArray);
+    var tagsArray = validation.splitTags(inputValue);
+    validation.checkAll(tagsArray);
   };
 
   validation.onTextAreaKeyup = function () {
@@ -136,6 +137,7 @@
   };
 
   validation.onHashtagKeyup = function () {
+    // при вводе инпута обнуляется массив ошибок
     validation.errors = [];
     validation.getValue();
     if (validation.errors.length !== 0) {
@@ -146,6 +148,7 @@
       validation.input.setCustomValidity('');
     }
   };
+
 
   validation.init = function () {
     validation.input.addEventListener('keyup', validation.onHashtagKeyup);
@@ -159,7 +162,8 @@
 
   window.validation = {
     init: validation.init,
-    reset: validation.reset
+    reset: validation.reset,
+    errors: validation.errors
   };
 
 })();

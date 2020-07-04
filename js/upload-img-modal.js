@@ -18,26 +18,33 @@
 
   UploadImgModal.prototype.initEvents = function () {
 
-    // добавление обработчиков эффектов, слайдера и размера изображения
+    // добавление обработчиков эффектов, слайдера и размера изображения и валидации
     window.slider.init();
     window.effect.init();
     window.validation.init();
     window.pictireSize.init();
-
 
     // добавление своих обработчиков
     this._inputHash.addEventListener('focus', this._onRemoveDocumentOnKeydown);
     this._inputDesc.addEventListener('focus', this._onRemoveDocumentOnKeydown);
     this._inputHash.addEventListener('blur', this._onDocumentEscDown);
     this._inputDesc.addEventListener('blur', this._onDocumentEscDown);
-    this._btnSubmit.addEventListener('click', this._onSubmit);
+
+    this.onSubmit();
+  };
+
+  UploadImgModal.prototype.onSubmit = function () {
+    if(true) {
+      this._btnSubmit.addEventListener('click', this._onSubmit);
+    }
   };
 
   UploadImgModal.prototype._onSubmit = function (evt) {
     evt.preventDefault();
+
+    var imgUploadFormElement = document.querySelector('#upload-select-image');
     this.onBtnCloseClick();
-    // window.backend.onSend(new FormData(imgUploadFormElement), showSuccessMessage, showErrorMessage);
-    window.backend.showSuccessMessage();
+    window.backend.onSend(new FormData(imgUploadFormElement), window.backend.showSuccessMessage, window.backend.showErrorMessage);
   };
 
   UploadImgModal.prototype._onRemoveDocumentOnKeydown = function () {
