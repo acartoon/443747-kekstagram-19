@@ -28,7 +28,7 @@
   };
 
   Notice.prototype._onClose = function (evt) {
-    if (evt.target.classList.contains('success')) {
+    if (evt.target.contains(this._template)) {
       this._onCloseMessage();
     }
   };

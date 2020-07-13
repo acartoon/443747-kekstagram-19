@@ -6,21 +6,21 @@
     MAX_LENGTH: 20,
     MIN_LENGTH: 2,
     MAX_LENGTH_TEXTAREA: 140,
-    tagsArray: [],
     HASHTAG_PATTERN: /[a-zA-Z0-9\u0400-\u04FF]+$/,
-    hash: '#',
     input: document.querySelector('.text__hashtags'),
     textarea: document.querySelector('.text__description'),
-    mistakes: {
-      firstСharacter: 'Хэш-тег должен начинаться с символа #',
-      hash: 'Хештеги должны разделяться пробелами',
-      tagContent: 'Хештег должен состоять из букв и чисел, а также не может содержать пробелы, спецсимволы и тд',
-      minLengtTags: 'Минимальное количество символов может быть не меньшье ' + 2 + ' символов',
-      maxLengtTags: 'Максимальное количество символов может быть не больше ' + 20 + ' символов',
-      doubleTags: 'Хештеги не могут использоваться дважды',
-      maxCountTag: 'Максимальное количество хештегов не может быть больше ' + 5
-    },
+    hash: '#',
     errors: []
+  };
+
+  validation.mistakes = {
+    firstСharacter: 'Хэш-тег должен начинаться с символа #',
+    hash: 'Хештеги должны разделяться пробелами',
+    tagContent: 'Хештег должен состоять из букв и чисел, а также не может содержать пробелы, спецсимволы и тд',
+    minLengtTags: 'Минимальное количество символов может быть не меньшье ' + validation.MIN_LENGTH + ' символов',
+    maxLengtTags: 'Максимальное количество символов может быть не больше ' + validation.MAX_LENGTH + ' символов',
+    doubleTags: 'Хештеги не могут использоваться дважды',
+    maxCountTag: 'Максимальное количество хештегов не может быть больше ' + validation.MAX_COUNT
   };
 
   validation.splitTags = function (string) {
@@ -109,25 +109,24 @@
         if (!validation.checkDoubleTags(tagsArray)) {
           validation.pushErrorMessage(validation.mistakes.doubleTags);
         }
+
       }); // end foreach
       if (validation.errors.length === 0 && !validation.checkDoubleTags(tagsArray)) {
         validation.pushErrorMessage(validation.mistakes.doubleTags);
       }
-
-      // if (validation.errors.length === 0) {
-      //   validation.errors = [];
-      // }
     } // end else
   };
 
-  validation.getValue = function () {
-    var inputValue = validation.input.value.trim();
-    var tagsArray = validation.splitTags(inputValue);
+  validation.getValue = function (tags) {
+    var tagsArray = validation.splitTags(tags);
     validation.checkAll(tagsArray);
   };
 
-  validation.onTextAreaKeyup = function () {
-    if (validation.textarea.value.length > validation.MAX_LENGTH_TEXTAREA) {
+  // валидация комментария
+  validation.onTextAreaKeyup = function (evt) {
+    var textarea = evt.target;
+
+    if (textarea.value.length > validation.MAX_LENGTH_TEXTAREA) {
       validation.textarea.setCustomValidity('Масимальная длина поля не более ' + validation.MAX_LENGTH_TEXTAREA + ' символов');
       validation.renderErrors(validation.textarea);
     } else {
@@ -136,34 +135,27 @@
     }
   };
 
-  validation.onHashtagKeyup = function () {
+  validation.onHashtagKeyup = function (evt) {
+    var tags = evt.target.value.trim();
+
     // при вводе инпута обнуляется массив ошибок
     validation.errors = [];
-    validation.getValue();
+    validation.getValue(tags);
+
     if (validation.errors.length !== 0) {
       validation.input.setCustomValidity(validation.errors.join('. \n'));
       validation.renderErrors(validation.input);
     } else {
       validation.unrenderErrors(validation.input);
       validation.input.setCustomValidity('');
+      // window.UploadImgModal.onSubmit();
     }
   };
 
 
-  validation.init = function () {
-    validation.input.addEventListener('keyup', validation.onHashtagKeyup);
-    validation.textarea.addEventListener('keyup', validation.onTextAreaKeyup);
-  };
-
-  validation.reset = function () {
-    validation.textarea.removeEventListener('keyup', validation.onTextAreaKeyup);
-    validation.input.removeEventListener('keyup', validation.onHashtagkeyup);
-  };
-
   window.validation = {
-    init: validation.init,
-    reset: validation.reset,
-    errors: validation.errors
+    onHashtagKeyup: validation.onHashtagKeyup,
+    onTextAreaKeyup: validation.onTextAreaKeyup,
   };
 
 })();

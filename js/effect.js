@@ -48,6 +48,7 @@
 
   // состояние по умолчанию
   pictureEffects.defaultState = function () {
+    pictureEffects.activeEffect = 'none';
     pictureEffects.image.classList = '';
     pictureEffects.image.style.filter = null;
     pictureEffects.image.src = '';

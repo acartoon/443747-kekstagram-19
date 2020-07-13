@@ -51,16 +51,14 @@
     xhr.send(data);
   };
 
-
   var showSuccessMessage = function () {
     var template = document.querySelector('#success').content.querySelector('.success').cloneNode(true);
     var success = new window.Notice(template);
-    // imgUploadFormElement.removeEventListener('submit', submit);
     success.init();
   };
 
   var showErrorMessage = function () {
-    var template = document.querySelector('#error').content.querySelector('.error');
+    var template = document.querySelector('#error').content.querySelector('.error').cloneNode(true);
     var error = new window.Notice(template);
     error.init();
   };

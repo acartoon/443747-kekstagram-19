@@ -12,6 +12,7 @@
     uploadImage.init();
   });
 
+  // неудачная загрузка
   var errorHandler = function (errorMessage) {
     var node = document.createElement('div');
     node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: red; padding: 20px 0';
@@ -24,7 +25,7 @@
     document.body.insertAdjacentElement('afterbegin', node);
   };
 
-
+  // успешная загрузка
   var onLoadHandler = function (photoData) {
     var data = photoData;
     window.renderGallery(data);
